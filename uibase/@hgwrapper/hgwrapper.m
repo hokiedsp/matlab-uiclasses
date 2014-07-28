@@ -176,7 +176,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
          
          % first attempt to detach HG object (if attached)
          h = obj.detach(); % detaches wrapper object from HG object
-         if ~isempty(h) && ~obj.autodetach
+         if ~(isempty(h) || obj.autodetach)
             obj.autodetach = true;
             h(~ishghandle(h)) = [];
             delete(h); % delete the associated HG object as well
