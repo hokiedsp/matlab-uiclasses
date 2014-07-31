@@ -57,15 +57,8 @@ if nargout==0 && nargin==1
    return;
 end
 
-pname = varargin{1};
-if nargin==2 && ischar(pname)% SET(H,'PropertyName')
-   try
-      a = set@hgsetgetex(obj,pname);
-   catch
-      a = obj.sethgprop(pname);
-   end
-elseif nargin==1 % A = SET(H)
-   a = set(obj);
+if nargin==1 % A = SET(H)
+   a = set@hgsetgetex(obj);
    if obj.isattached()
       a_hg = obj.sethgprop();
       anames = fieldnames(a_hg);
@@ -76,10 +69,18 @@ elseif nargin==1 % A = SET(H)
          end
       end
    end
+   
+elseif nargin==2 && ischar(varargin{1})% SET(H,'PropertyName')
+   pname = varargin{1};
+   try
+      a = set@hgsetgetex(obj,pname);
+   catch
+      a = obj.sethgprop(pname);
+   end
 else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
-% Since the properties must be set in the order given, each property must
-% be set separately
-
+   % Since the properties must be set in the order given, each property must
+   % be set separately
+   
    Nargs = numel(varargin);
    n = 1;
    while n<=Nargs % process one property at time

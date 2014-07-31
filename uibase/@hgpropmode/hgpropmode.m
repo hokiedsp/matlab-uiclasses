@@ -34,7 +34,7 @@ classdef hgpropmode < hgsetgetex
    %
    %   Property value management
    %      setPropertyToDefault - reset the property value to the default
-   %      isValueChanged       - true if the property value is changed from the default
+   %      hasValueChanged      - true if the property value is changed from the default
    %      forceValueChanged    - manually set ValueChanged flag
    %
    %   Getting and setting parameters:

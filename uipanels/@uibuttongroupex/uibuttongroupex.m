@@ -48,6 +48,12 @@ classdef uibuttongroupex < uiflowgridcontainer
    %      @UIBUTTONGROUPEX/UIBUTTONGROUPEX   - Construct UIBUTTONGROUPEX object.
    %      delete                 - Delete UIBUTTONGROUPEX object.
    %
+   %   HG Grid Element Object Manipulation
+   %      addElement    - Add grid elements
+   %      removeElement - Remove grid elements
+   %      setElement    - Change elements' grid layout properties
+   %      getElement    - Get elements' grid layout properties
+   %
    %   HG Object Association:
    %      attach                 - Attach HG panel-type object.
    %      detach                 - Detach HG object.
@@ -112,7 +118,7 @@ classdef uibuttongroupex < uiflowgridcontainer
          %   that each object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         varargin = uibuttongroupex.autoattach(mfilename,@uibuttongroup,varargin);
+         varargin = uibuttongroupex.autoattach(mfilename,@uibuttongroup,{'uibuttongroup'},varargin);
          obj = obj@uiflowgridcontainer(varargin{:});
       end
    end
@@ -124,7 +130,7 @@ classdef uibuttongroupex < uiflowgridcontainer
       
       set_elemensnames(obj,names) % to implement set.ElementsNames
       
-      register_element(obj,h,toRegister) % overriding
+      added = add_element(obj,h) % overriding
       
       check_child(obj,h) % keep uicontrol styles in check
       

@@ -1,4 +1,4 @@
-function setelement(obj,varargin)
+function setElement(obj,varargin)
 %UIFLOWGRIDCONTAINER/SETELEMENT
 %   SETELEMENT(OBJ,H,'Prop1Name',Prop1Value,'Prop2Name',Prop2Value,...)
 %   SETELEMENT(OBJ,SUBS,...)

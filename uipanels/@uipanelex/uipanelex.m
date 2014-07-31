@@ -119,11 +119,17 @@ classdef uipanelex < hgenable
          %   that each object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         varargin = uipanelex.autoattach(mfilename,@uipanel,varargin);
+         varargin = uipanelex.autoattach(mfilename,@uipanel,...
+            {'figure','axes','uipanel','uicontainer','uiflowcontainer','uigridcontainer','uitabgroup','uitab'},varargin);
          obj = obj@hgenable(varargin{:});
       end
    end
    methods (Access=protected)
+      function types = supportedtypes(obj) % supported HG object types
+         % override this function to limit object types
+         types = {'figure','axes','uipanel','uicontainer','uiflowcontainer','uigridcontainer','uitabgroup','uitab'};
+      end
+      
       init(obj) % (overriding)
       validatehg(obj,h) % (overriding) to be validate that the HG object is supported by the class
       
@@ -145,7 +151,7 @@ classdef uipanelex < hgenable
    end
    
    methods (Access=protected,Static)
-      argin = autoattach(clsname,hgobj,argin)
+      argin = autoattach(clsname,hgobj,types,argin)
       
       sz = get_displayarea(h) % return the size of the actual visible panel area
       bmargin = get_bordermargins(h) % return the total panel border thickness

@@ -19,7 +19,7 @@ N = sum(I); % # of elements needed
 Nh = numel(obj.elem_h); % # of existing elements
 
 % remove excess elements
-obj.remove(obj.elem_h(N+1:Nh),'delete');
+obj.removeElement(obj.elem_h(N+1:Nh),'delete');
 
 % get the grid location subscripts of the new elements
 [subs(:,1),subs(:,2)] = ind2sub(gridsize,find(I));

@@ -143,7 +143,7 @@ classdef uiscrollpanel < uipanelex
          %   that each object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         varargin = uipanelex.autoattach(mfilename,@uicontainer,varargin);
+         varargin = uipanelex.autoattach(mfilename,@uicontainer,{'uipanel','uicontainer','uiflowcontainer','uigridcontainer'},varargin);
          obj = obj@uipanelex(varargin{:});
       end
    end

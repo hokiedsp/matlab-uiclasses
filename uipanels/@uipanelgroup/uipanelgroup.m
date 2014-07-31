@@ -97,7 +97,7 @@ classdef uipanelgroup < uipanelex
          %   object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         varargin = uipanelex.autoattach(mfilename,@uipanel,varargin);
+         varargin = uipanelex.autoattach(mfilename,@uipanel,{'uipanel','uicontainer'},varargin);
          obj = obj@uipanelex(varargin{:});
          
       end

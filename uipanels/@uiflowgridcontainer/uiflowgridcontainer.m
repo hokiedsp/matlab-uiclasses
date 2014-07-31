@@ -44,8 +44,10 @@ classdef uiflowgridcontainer < uipanelautoresize
    %      delete                 - Delete UIFLOWGRIDCONTAINER object.
    %
    %   HG Grid Element Object Manipulation
-   %      add                    - Add grid elements
-   %      remove                 - Remove grid elements
+   %      addElement    - Add grid elements
+   %      removeElement - Remove grid elements
+   %      setElement    - Change elements' grid layout properties
+   %      getElement    - Get elements' grid layout properties
    %
    %   HG Object Association:
    %      attach                 - Attach HG panel-type object.
@@ -117,10 +119,10 @@ classdef uiflowgridcontainer < uipanelautoresize
    end
    
    methods (Sealed)
-      add(obj,H,varargin)
-      remove(obj,H,delopt)
-      setelement(obj,H,varargin)
-      pv = getelement(obj,H,pn)
+      addElement(obj,H,varargin)
+      removeElement(obj,H,delopt)
+      setElement(obj,H,varargin)
+      pv = getElement(obj,H,pn)
    end
    
    methods
@@ -162,11 +164,17 @@ classdef uiflowgridcontainer < uipanelautoresize
          %   that each object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         varargin = uipanelex.autoattach(mfilename,@uipanel,varargin);
+         varargin = uipanelex.autoattach(mfilename,@uipanel,...
+            {'figure','uipanel','uicontainer','uitab'}, varargin);
          obj = obj@uipanelautoresize(varargin{:});
       end
    end
    methods (Access=protected)
+      function types = supportedtypes(obj) % supported HG object types
+         % override this function to limit object types
+         types = {'figure','uipanel','uicontainer','uitab'};
+      end
+      
       init(obj) % (overriding)
       
       populate_panel(obj) % populate obj.hg
@@ -174,9 +182,12 @@ classdef uiflowgridcontainer < uipanelautoresize
       update_grid(obj) % update obj.map to reflect changes in GridSize, ElementsLocation
       update_gridlims(obj) % update the limits of column width and row heights
 
-      register_element(obj,h,toRegister) % overriding
-
-      remove_elements(obj,h)
+      register_element(obj,h)   % ObjectChildAdded event callback
+      unregister_element(obj,h) % ObjectChildRemoved event callback
+      
+      added = add_element(obj,h) % add new element (no layout update)
+      remove_elements(obj,h)  % remove existing elements (no layout update)
+      
       subs = nextcellsubs(obj,Nadd) % get the next available unoccupied grid cells
 
       val = get_contentextent(obj,h) % Returns size of panel content
@@ -273,7 +284,7 @@ classdef uiflowgridcontainer < uipanelautoresize
       function set.ExcludedChildren(obj,val)
          if obj.isattached()
             obj.validateproperty('ExcludedChildren',val);
-            obj.remove_elements(obj,val)
+            obj.remove_elements(val)
          elseif ~isempty(val)
             error('ExcludedChildren can only be set if there is an attached HG object.');
          end
@@ -295,8 +306,8 @@ classdef uiflowgridcontainer < uipanelautoresize
          if obj.isattached()
             obj.validateproperty('Elements',val);
             val = handle(val);
-            obj.remove_elements(obj,setdiff(val,obj.elem_h));
-            obj.add(val);
+            obj.remove_elements(setdiff(obj.elem_h,val)); % remove no longer in val
+            obj.addElement(setdiff(val,obj.elem_h)); % add not yet in obj.elem_h
          elseif ~isempty(val)
             error('Elements can only be set if there is an attached HG object.');
          end

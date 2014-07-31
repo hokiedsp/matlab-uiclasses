@@ -1,4 +1,4 @@
-function argin = autoattach(clsname,hgobj,argin)
+function argin = autoattach(clsname,hgobj,supportedtypes,argin)
 %HGWRAPPER/AUTOATTACH   Create new HG object for HGWRAPPER object in construction
 %   ARGIN_MODIFIED = AUTOATTACH(CLASSNAME,CREATEHGFCN,ARGIN_ORIGINAL)
 %   create new HG objects for the new class with the name CLASSNAME, by
@@ -29,9 +29,21 @@ function argin = autoattach(clsname,hgobj,argin)
 
 Narg = numel(argin);
 
-% check for HG handles already given
-if Narg>0 && (isempty(argin{1}) || all(ishghandle(argin{1}(:))))
-   return;
+if Narg>0
+   h = argin{1}(:);
+   % empty argument -> detached sclar object
+   if isempty(h)
+      return;
+   end
+   % check if HG handles are given as the first argument
+   if all(ishghandle(h)) && all(ishghandle(h)) && numel(unique(h))==numel(h)
+      if isempty(supportedtypes), return; end % supports any type
+      
+      % make sure it is valid type
+      if isempty(setdiff(get(h,'Type'),supportedtypes,'stable'))
+         return;
+      end
+   end
 end
 
 % Step 1: Check the function call stack and make sure it is the explicit

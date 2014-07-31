@@ -21,7 +21,7 @@ else
       if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
          error('The name ''%s'' is not an accessible property for an instance of class ''%s''.',name,class(obj));
       else
-         error('Bad property value found.\nObject Name: %s\nProperty Name: ''%s''\nError Message: %s',class(obj),name,ME.message);
+         error('Bad property value found.\nObject Name: %s\nProperty Name: ''%s''\nError Message: %s',class(obj),char(name),ME.message);
       end
    end
 end

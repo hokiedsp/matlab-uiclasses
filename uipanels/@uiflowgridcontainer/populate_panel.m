@@ -19,11 +19,11 @@ if strcmp(get(obj.hg,'Type'),'uipanel')
 end
 
 % Add all existing Children to the grid
-obj.add(get(obj.hg,'Children'));
+obj.addElement(get(obj.hg,'Children'));
 
 % set ChildrenAdded listeners for obj.hg to automatically move added
 % child over to canvas.
 obj.hg_listener(end+1) = addlistener(obj.hg,'ObjectChildAdded',...
-   @(~,event)obj.register_element(event.Child,true));
+   @(~,event)obj.register_element(event.Child));
 obj.hg_listener(end+1) = addlistener(obj.hg,'ObjectChildRemoved',...
-   @(~,event)obj.register_element(event.Child,false));
+   @(~,event)obj.unregister_element(event.Child));

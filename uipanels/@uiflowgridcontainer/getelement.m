@@ -1,4 +1,4 @@
-function pv = getelement(obj,h,pn)
+function pv = getElement(obj,h,pn)
 %UIFLOWGRIDCONTAINER/SETELEMENT
 %   V = GETELEMENT(OBJ,H,'PropName')
 %   V = GETELEMENT(OBJ,SUBS,'PropName')

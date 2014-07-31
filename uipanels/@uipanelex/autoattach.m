@@ -1,4 +1,4 @@
-function argin = autoattach(clsname,hgobj,argin)
+function argin = autoattach(clsname,hgobj,types,argin)
 %UIPANELEX/AUTOATTACH   Create new HG objects if the first argument is a handle
 %object array or empty. The new objects are only created if the calling
 %class constructor is explicitly invoked
@@ -19,4 +19,4 @@ if ~isempty(argin) && ~(all(ishghandle(argin{1}(:))) || isempty(argin{1}))
 end
 
 % if non-property line arguments were not given, call superclass autoattach
-argin = hgenable.autoattach(clsname,hgobj,argin);
+argin = hgenable.autoattach(clsname,hgobj,types,argin);

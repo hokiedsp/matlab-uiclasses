@@ -61,6 +61,12 @@ classdef uiaxesarray < uiflowgridcontainer
 %      @UIAXESARRAY/UIAXESARRAY   - Construct UIAXESARRAY object.
 %      delete                 - Delete UIAXESARRAY object.
 %
+%   HG Grid Element Object Manipulation
+%      addElement    - Add grid elements
+%      removeElement - Remove grid elements
+%      setElement    - Change elements' grid layout properties
+%      getElement    - Get elements' grid layout properties
+%
 %   HG Object Association:
 %      attach                 - Attach HG panel-type object.
 %      detach                 - Detach HG object.
@@ -136,7 +142,7 @@ classdef uiaxesarray < uiflowgridcontainer
          %   object will be updated with a different set of values for the list of
          %   property names contained in pn.
          
-         varargin = uiaxesarray.autoattach(mfilename,@uicontainer,varargin);
+         varargin = uiaxesarray.autoattach(mfilename,@uicontainer,{'uicontainer','uipanel','uitab'},varargin);
          obj = obj@uiflowgridcontainer(varargin{:});
       end
    end
@@ -147,7 +153,7 @@ classdef uiaxesarray < uiflowgridcontainer
 
       init(obj)
       layout_panel(obj)
-      register_element(obj,h,toRegister)
+      added = add_element(obj,h)
       linkaxes(obj,cols,val)
    end   
    methods

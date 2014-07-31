@@ -81,7 +81,7 @@ else % all properties
       v1 = obj.get@hgsetgetex(f1).';
       [v2,f2] = obj.gethgprops();
       
-      [f2,I] = setdiff(f2,f1);
+      [f2,I] = setdiff(f2,f1,'stable');
       fnames = cat(1,f1,f2);
       fvals = cat(1,v1,v2(I));
       varargout{1} = cell2struct(fvals,fnames,1);
