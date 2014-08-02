@@ -4,7 +4,10 @@ function clrTarget(obj)
 %   HGPROPMODE objects in OBJ array.
 
 % delete the listeners
+try
 delete([obj.lis_prop_postset obj.lis_destroy]);
+catch
+end
 
 % clear property values
 [obj.GraphicsHandle, obj.DefaultValue, obj.lis_prop_postset,obj.lis_destroy] = deal([]);

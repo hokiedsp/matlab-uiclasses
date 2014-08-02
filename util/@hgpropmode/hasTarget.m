@@ -6,5 +6,5 @@ function tf = hasTarget(obj)
 
 tf = false(size(obj));
 for n = 1:numel(obj)
-   tf(n) = isempty(obj(n).GraphicsHandle);
+   tf(n) = ~isempty(obj(n).GraphicsHandle);
 end
