@@ -18,5 +18,5 @@ obj.attach_se@hgenable(h);
 % populate the panel (if defined by subclass)
 obj.populate_panel();
 
-% initial layout % if defined by subclass)
-obj.layout_panel();
+% initial layout (if defined by subclass)
+obj.layout();

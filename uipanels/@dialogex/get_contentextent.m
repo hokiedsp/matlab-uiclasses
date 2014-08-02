@@ -1,5 +1,5 @@
-function val = get_contentextent(obj,h)
-%UIPANELEX/GET_CONTENTEXTENT   Returns size of panel content
+function val = get_contentextent(obj,~)
+%DIALOGEX/GET_CONTENTEXTENT   Returns size of panel content
 %   POS = GET_CONTENTEXTENT(OBJ) returns a position rectangle indicating
 %   the tightest rectangle encompassing panel's child objects. POS is a
 %   four-element vector that defines the size and position, and has the
@@ -14,27 +14,20 @@ function val = get_contentextent(obj,h)
 %   POS = GET_CONTENTEXTENT(OBJ,H) finds the tightest rectangle
 %   encompassing the objects in H.
 
-if obj.isattached()
-   if strcmp(obj.hg.Type,'axes')
-      val = obj.hg.Position;
-      ti = obj.hg.TightInset;
-      val([1 2]) = -ti([1 2]);
-      val([3 4]) = val([3 4]) + ti([1 2]) + ti([3 4]);
+if ~obj.isattached(), val = []; return; end
+
+u = get(obj.hg,'Units');
+bbext = obj.pnButtonBox.Extent;
+
+hgw = hgwrapper.findobj(obj.ContentPanel);
+if isempty(hgw) || ~isa(hgw,'uipanelex')
+
+   h = get(obj.ContentPanel,'Children');
+   
+   if isempty(h)
+      cbext = [0 0 0 0];
    else
-      if nargin<2
-         h = get(obj.hg,'Children');
-      end
-      
-      if isempty(h)
-         val = [];
-         return;
-      end
-      
-      % disable listeners
-      set(obj.content_listeners,'Enabled','off');
-      
       % save child units and set them to panel's units
-      u = get(obj.hg,'Units');
       uc = get(h,{'Units'});
       set(h,'Units',u);
       
@@ -42,14 +35,16 @@ if obj.isattached()
       pos = cell2mat(get(h,{'Position'}));
       llh = min(pos(:,[1 2]),[],1);
       urh = max(pos(:,[1 2]) + pos(:,[3 4]),[],1); % upper-right-hand corner
-      val = [llh urh-llh];
+      cbext = [1 1 urh-llh];
       
       % rever the children's Units
       set(h,{'Units'},uc);
-      
-      % reenable listeners
-      set(obj.content_listeners,'Enabled','on');
    end
 else
-   val = [];
+   cbext = hgw.Extent;
+end
+
+val = [0 0 max(bbext(3),cbext(3)) bbext(4)+cbext(4)];
+if u(1)=='p' % if units is pixels, set x0 and y0 to 1
+   val([1 2]) = 1;
 end

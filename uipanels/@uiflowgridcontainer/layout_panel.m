@@ -3,8 +3,11 @@ function layout_panel(obj)
 %   LAYOUT_PANEL(OBJ) layouts the child objects of OBJ.hg according to the
 %   current panel size.
 
-h = obj.Elements;
+h = obj.elem_h;
 if isempty(h) || ~obj.autolayout, return; end
+
+% make sure the panel size is larger than the minimum
+obj.layout_panel@uipanelautoresize();
 
 % put all units in pixels
 lisena = get(obj.content_listeners,{'Enabled'});
@@ -19,11 +22,14 @@ mout = obj.outmargin([1 3 2 4]);
 mout(2) = mout(2) + sum(bmargin([1 2]));
 mout(4) = mout(4) + sum(bmargin([3 4]));
 
+% determine the grid structure including object visibility
+[col_wlims,row_hlims,Ivis,subs] = obj.format_grid();
+
 try
    % compute the column widths and row heights
    pos = get(obj.hg,'Position');
-   [X0,Wcol] = layout_grid(obj.gridsize(2),obj.col_wlims,pos(3),obj.inmargin(1),mout([1 2]));
-   [Y0,Hrow] = layout_grid(obj.gridsize(1),obj.row_hlims,pos(4),obj.inmargin(2),mout([4 3]));
+   [X0,Wcol] = layout_grid(size(col_wlims,1),col_wlims,pos(3),obj.inmargin(1),mout([1 2]));
+   [Y0,Hrow] = layout_grid(size(row_hlims,1),row_hlims,pos(4),obj.inmargin(2),mout([4 3]));
    
    % record the excess space on the panel
    dX = (pos(3) - X0(end));
@@ -48,8 +54,8 @@ try
    end
       
    % set positions of each element
-   for n = 1:numel(h)
-      subs0 = obj.elem_subs(n,:);
+   for n = Ivis.'
+      subs0 = subs(n,:);
       span = obj.elem_span(n,:)-1;
       subs1 = subs0 + span;
       

@@ -92,16 +92,13 @@ if gridupdate
    set_grid(obj,I,loc,span);
 end
 
-gridlimupdate = false;
 for n = 1:numel(pn)
    if isgridprop(n)
       switch pn{n}
          case 'heightlimits'
             set_lims(obj,I,pv(:,n),4,'elem_hlims');
-            gridlimupdate = true;
          case 'widthlimits'
             set_lims(obj,I,pv(:,n),3,'elem_wlims');
-            gridlimupdate = true;
          case 'horizontalalignment'
             set_align(obj,I,pv(:,n),obj.elem_halign_opts,'elem_halign');
          case 'verticalalignment'
@@ -118,8 +115,6 @@ obj.autolayout = alprev;
 % perform necessary layout update
 if gridupdate
    obj.update_grid(); % re-map the grid elements
-elseif gridlimupdate
-   obj.update_gridlims(); % re-compute the grid column & row limits
 else
    obj.layout_panel(); % just re-layout
 end

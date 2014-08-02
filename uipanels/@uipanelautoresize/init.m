@@ -8,10 +8,12 @@ function init(obj)
 
 obj.init@uipanelex();
 
-obj.defaultresizefcn = @(~,~)obj.layout_panel();
+obj.rfmode = hgpropmode;
 
 obj.propopts.ResizeFcnMode = struct(...
-   'StringOptions',{{'manual','auto'}},...
-   'Default','auto');
+   'StringOptions',{{'auto','manual'}});
+obj.propopts.MinimumPanelSize = struct(...
+   'OtherTypeValidator',{{{'numeric'},{'numel',2,'positive','finite'}}},...
+   'Default',[1 1]);
 
 obj.sortpropopts([],false,false,true,true);

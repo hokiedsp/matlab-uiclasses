@@ -26,4 +26,4 @@ for n = 1:N
 end
 
 % done, now compute the limits of grid columns and rows
-obj.update_gridlims();
+obj.layout_panel();

@@ -1,58 +1,66 @@
 classdef uipanelautoresize < uipanelex
-%UIPANELAUTORESIZE   adding ResizeFcnMode support to a panel-type HG object
-%   UIPANELAUTORESIZE class makes supporting HG objects to an HG object
-%   transparent to the users. When any HG object (except for figure and
-%   descendents of axes object) is attached to UIPANELAUTORESIZE object, it shows
-%   the HG object as its GraphisHandle, and the properties of the HG object
-%   are linked in the set/get methods. However, the HG object is placed on
-%   a transparent uicontainer at the time of attachment, and additional HG
-%   components may be placed on the uicontainer by the derived class.
-%
-%   UIPANELAUTORESIZE inherits and extends Enable property from its superclass,
-%   HGENABLE. 
-%
-%   Unlike other uipanels, GraphicsHandle property and set/get interface
-%   of UIPANELAUTORESIZE connects to uicontrol and not the enclosing panel.
-%
-%   UIPANELAUTORESIZE properties.
-%      AutoDetach       - Simultaneous deletion of HG object
-%      AutoLayout       - [{'on'}|'off'] to re-layout panel automatically
-%                         if panel content has changed.
-%      Enable          - Enable or disable the panel and its contents
-%      Extent          - (Read-only) tightest position rectangel encompassing all Children
-%      HGDetachable    - (Read-only) Indicate whether attach/detach can be called
-%      GraphicsHandle  - Attached HG object handle
-%      ResizeFcnMode   - {'manual','auto'}
-%
-%   UIPANELAUTORESIZE methods:
-%   UIPANELAUTORESIZE object construction:
-%      @UIPANELAUTORESIZE/UIPANELAUTORESIZE   - Construct UIPANELAUTORESIZE object.
-%      delete                 - Delete UIPANELAUTORESIZE object.
-%
-%   HG Object Association:
-%      attach                 - Attach HG panel-type object.
-%      detach                 - Detach HG object.
-%      isattached             - True if HG object is attached.
-%
-%   HG Object Control:
-%      enable               - Enable the panel content
-%      disable              - Disable the panel content
-%      inactivate           - Inactivate (visually on, functionally off)
-%                             the panel content.
-%
-%   Getting and setting parameters:
-%      get              - Get value of UIPANELAUTORESIZE object property.
-%      set              - Set value of UIPANELAUTORESIZE object property.
-%
-%   Static methods:
-%      ispanel          - true if HG object can be wrapped by UIPANELAUTORESIZE
-   properties
+   %UIPANELAUTORESIZE   adding ResizeFcnMode support to a panel-type HG object
+   %   UIPANELAUTORESIZE class makes supporting HG objects to an HG object
+   %   transparent to the users. When any HG object (except for figure and
+   %   descendents of axes object) is attached to UIPANELAUTORESIZE object, it shows
+   %   the HG object as its GraphisHandle, and the properties of the HG object
+   %   are linked in the set/get methods. However, the HG object is placed on
+   %   a transparent uicontainer at the time of attachment, and additional HG
+   %   components may be placed on the uicontainer by the derived class.
+   %
+   %   UIPANELAUTORESIZE inherits and extends Enable property from its superclass,
+   %   HGENABLE.
+   %
+   %   Unlike other uipanels, GraphicsHandle property and set/get interface
+   %   of UIPANELAUTORESIZE connects to uicontrol and not the enclosing panel.
+   %
+   %   UIPANELAUTORESIZE properties.
+   %      ResizeFcnMode - [{'auto'}|'manual'] 'auto' sets to re-layout when
+   %                      panel size is changed and AutoLayout='on'.
+   %      MinimumPanelSize - [width height] in pixels to force the minimum
+   %                         panel size.
+   %
+   %      AutoDetach       - Simultaneous deletion of HG object
+   %      AutoLayout       - [{'on'}|'off'] to re-layout panel automatically
+   %                         if panel content has changed.
+   %      Enable          - Enable or disable the panel and its contents
+   %      Extent          - (Read-only) tightest position rectangel encompassing all Children
+   %      HGDetachable    - (Read-only) Indicate whether attach/detach can be called
+   %      GraphicsHandle  - Attached HG object handle
+   %      ResizeFcnMode   - {'manual','auto'}
+   %
+   %   UIPANELAUTORESIZE methods:
+   %   UIPANELAUTORESIZE object construction:
+   %      @UIPANELAUTORESIZE/UIPANELAUTORESIZE   - Construct UIPANELAUTORESIZE object.
+   %      delete                 - Delete UIPANELAUTORESIZE object.
+   %
+   %   HG Object Association:
+   %      attach                 - Attach HG panel-type object.
+   %      detach                 - Detach HG object.
+   %      isattached             - True if HG object is attached.
+   %
+   %   HG Object Control:
+   %      enable               - Enable the panel content
+   %      disable              - Disable the panel content
+   %      inactivate           - Inactivate (visually on, functionally off)
+   %                             the panel content.
+   %
+   %   Getting and setting parameters:
+   %      get              - Get value of UIPANELAUTORESIZE object property.
+   %      set              - Set value of UIPANELAUTORESIZE object property.
+   %
+   %   Static methods:
+   %      ispanel          - true if HG object can be wrapped by UIPANELAUTORESIZE
+   properties (Dependent)
       ResizeFcnMode   % 'auto'|'manual': 'auto' to set UIPANELAUTORESIZE resize function to adjust HG size
    end
-   properties (Access=protected)
-      defaultresizefcn % default to @(~,~)obj.layout_panel() during initialization, may be changed by derived classes
+   properties
+      MinimumPanelSize % [width height] in pixels
    end
-
+   properties (Access=protected)
+      rfmode % default to @(~,~)obj.layout_panel() during initialization, may be changed by derived classes
+   end
+   
    methods
       function obj = uipanelautoresize(varargin)
          %UIPANELAUTORESIZE/UIPANELAUTORESIZE   Construct UIPANELAUTORESIZE object.
@@ -91,16 +99,36 @@ classdef uipanelautoresize < uipanelex
    methods (Access=protected)
       init(obj) % (overriding)
       populate_panel(obj)
-      check_resizefcn(obj,val) % listener callback for hpanel's ResizeFcn
+      unpopulate_panel(obj) % listener callback for hpanel's ResizeFcn
+      layout_panel(obj)
    end
    
    methods
       %ResizeFcnMode   % 'manual'||'auto'
-      function set.ResizeFcnMode(obj,val)
-         [obj.ResizeFcnMode,val] = obj.validateproperty('ResizeFcnMode',val);
-         if obj.isattached() && val==2 % if auto
-            set(obj.hg,'ResizeFcn',obj.defaultresizefcn); %#ok
+      function val = get.ResizeFcnMode(obj)
+         if obj.rfmode.hasTarget()
+            val = obj.propopts.ResizeFcnMode.StringOptions{obj.rfmode.hasValueChanged+1};
+         else
+            val = '';
          end
+      end
+      function set.ResizeFcnMode(obj,val)
+         if obj.rfmode.hasTarget()
+            [~,val] = obj.validateproperty('ResizeFcnMode',val);
+            if val==1 % 'auto'
+               obj.rfmode.setPropertyToDefault();
+            end
+         else
+            if ~isempty(val)
+               error('ResizeFcnMode cannot be set if OBJ is not attached to a figure.');
+            end
+         end
+      end
+      
+      function set.MinimumPanelSize(obj,val)
+         obj.validateproperty('MinimumPanelSize',val);
+         obj.MinimumPanelSize = val;
+         obj.layout_panel();
       end
    end
 end

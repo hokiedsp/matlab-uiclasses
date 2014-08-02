@@ -21,22 +21,25 @@ if isempty(obj.elem_h)
    return;
 end
 
+% determine the grid structure including object visibility
+[col_wlims,row_hlims,Ivis,subs] = obj.format_grid();
+
 if full
-   col_wlims = obj.col_wlims;
-   row_hlims = obj.row_hlims;
-   ncol = obj.gridsize(2);
-   nrow = obj.gridsize(1);
+   ncol = size(col_wlims,1);
+   nrow = size(row_hlims,1);
 else
    % determine which columns and rows h occupies
    [~,I] = intersect(obj.elem_h,h);
-   melem = obj.elem_subs(I,1); % rows
+   I = intersect(I,Ivis);
+   
+   melem = subs(I,1); % rows
    m = [min(melem) max(melem)];
-   row_hlims = obj.row_hlims(m(1):m(2));
+   row_hlims = row_hlims(m(1):m(2));
    nrow = diff(m)+1;
 
-   nelem = obj.elem_subs(I,2); % columns
+   nelem = subs(I,2); % columns
    n = [min(nelem) max(nelem)];
-   col_wlims = obj.col_wlims(n(1):n(2));
+   col_wlims = col_wlims(n(1):n(2));
    ncol = diff(n)+1;
 end
 

@@ -18,6 +18,7 @@ classdef uiflowgridcontainer < uipanelautoresize
    %      ElementSpacings     - [horizontal vertical] spacings between 
    %                            elements in pixels
    %      VerticalAlignment   - 'bottom'|'middle'|{'top'}
+   %      EliminateEmptySpace - ['on'|'off'] empty grid rows/columns are eliminated 
    %
    %      Elements            - children HG objects in grid
    %      ElementsHeightLimits - height limits in pixels, each row: [min max]
@@ -25,8 +26,8 @@ classdef uiflowgridcontainer < uipanelautoresize
    %      ElementsLocation     - [row column] element's location on the grid 
    %                            upper-left-corner is [1 1].
    %      ElementsSpan         - How many grid cells to occupy: each row [nrows ncols]
-   %       ElementsHorizontalAlignment % 'left'|'center'|'right'
-   %       ElementsVerticalAlignment   % 'bottom'|'middle'|'top'
+   %      ElementsHorizontalAlignment % 'left'|'center'|'right'
+   %      ElementsVerticalAlignment   % 'bottom'|'middle'|'top'
    %      NumberOfElements     - number of elements on the grid
    %
    %      AutoDetach      - Simultaneous deletion of HG object
@@ -78,6 +79,7 @@ classdef uiflowgridcontainer < uipanelautoresize
       HorizontalAlignment % 'left'|'center'|'right'
       VerticalAlignment   % 'bottom'|'middle'|'top'
       ExcludedChildren    % list of ignored children objects
+      EliminateEmptySpace % ['on'|'off'] empty grid rows/columns are eliminated 
       
       Elements            % children HG objects in grid
       ElementsHeightLimits % height limits in pixels, each row: [min max]
@@ -95,6 +97,7 @@ classdef uiflowgridcontainer < uipanelautoresize
       outmargin  % outside margin [left right bottom top]
       halign     % horizontal alignment of grid wrt panel
       valign     % vertical alignment of grid wrt panel
+      elimempty  % true to eliminate empty row/column
       
       elem_h       % HG objects to be included
       elem_wlims   % elements' width limits
@@ -180,8 +183,9 @@ classdef uiflowgridcontainer < uipanelautoresize
       populate_panel(obj) % populate obj.hg
       layout_panel(obj)   % layout obj.hg children
       update_grid(obj) % update obj.map to reflect changes in GridSize, ElementsLocation
-      update_gridlims(obj) % update the limits of column width and row heights
-
+      
+      [col_wlims,row_hlims,Ivis,subs] = format_grid(obj)
+      
       register_element(obj,h)   % ObjectChildAdded event callback
       unregister_element(obj,h) % ObjectChildRemoved event callback
       
@@ -232,7 +236,7 @@ classdef uiflowgridcontainer < uipanelautoresize
             val(2) = val;
          end
          obj.inmargin = obj.validateproperty('ElementSpacings',val);
-         obj.update_gridlims();
+         obj.layout_panel();
       end
       function val = get.Margins(obj)
          val = obj.outmargin;
@@ -242,7 +246,7 @@ classdef uiflowgridcontainer < uipanelautoresize
             val(2:4) = val;
          end
          obj.outmargin = obj.validateproperty('Margins',val);
-         obj.update_gridlims();
+         obj.layout_panel();
       end
       
       % HorizontalAlignment % 'left'|'center'|'right'|'distribute'
@@ -327,7 +331,7 @@ classdef uiflowgridcontainer < uipanelautoresize
          else
             obj.validateproperty('ElementsHeightLimits',val);
             obj.elem_hlims = val;
-            obj.update_gridlims();
+            obj.layout_panel();
          end
       end
       
@@ -345,7 +349,7 @@ classdef uiflowgridcontainer < uipanelautoresize
          else
             obj.validateproperty('ElementsWidthLimits',val);
             obj.elem_wlims = val;
-            obj.update_gridlims();
+            obj.layout_panel();
          end
       end
       
@@ -421,11 +425,22 @@ classdef uiflowgridcontainer < uipanelautoresize
       
       % AutoExpand - grid auto-expansion mode
       function val = get.AutoExpand(obj)
-         val = obj.propopts.AutoExpand.StringOptions{obj.autoexpand+1};
+         val = obj.propopts.AutoExpand.StringOptions{2-obj.autoexpand};
       end
       function set.AutoExpand(obj,val)
          [~,val] = obj.validateproperty('AutoExpand',val);
-         obj.autoexpand = logical(val-1);
+         obj.autoexpand = logical(2-val);
       end
-   end
+      
+      % EliminateEmptySpace - 'on' to eliminate rows & columns with no
+      % element
+      function val = get.EliminateEmptySpace(obj)
+         val = obj.propopts.EliminateEmptySpace.StringOptions{2-obj.autoexpand};
+      end
+      function set.EliminateEmptySpace(obj,val)
+         [~,val] = obj.validateproperty('EliminateEmptySpace',val);
+         obj.elimempty = logical(2-val);
+         obj.layout_panel();
+      end
+   end      
 end

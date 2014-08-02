@@ -8,11 +8,5 @@ function populate_panel(obj)
 % call superclass method first
 obj.populate_panel@uipanelex();
 
-% if ResizeFcnMode='auto', set ResizeFcn
-if strcmp(obj.ResizeFcnMode,obj.propopts.ResizeFcnMode.StringOptions{2})
-   set(obj.hg,'ResizeFcn',obj.defaultresizefcn);
-end
-   
-% set ChildrenAdded listeners to destroy the content_listeners
-obj.hg_listener(end+1) = addlistener(obj.hg,'ResizeFcn','PostSet',...
-   @(~,event)obj.check_resizefcn(event.NewValue));
+% set ResizeFcn monitor
+obj.rfmode.setTarget(obj.hg,'ResizeFcn',@(~,~)obj.layout_panel());

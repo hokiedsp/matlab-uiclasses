@@ -14,8 +14,8 @@ if isempty(I)
    Navail = 0;
    subs = zeros(0,2);
 else
-   Navail = numel(I);
-   subs = [I J];
+   Navail = min(numel(I),Nadd);
+   subs = [I(:) J(:)];
 end
 subs(Nadd+1:end,:) = [];
 

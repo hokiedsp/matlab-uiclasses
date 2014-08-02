@@ -9,7 +9,7 @@ function delete_listeners(obj,h)
 %   the graphics object that has been removed, then that listener will be
 %   deleted and removed from obj.content_listners array.
 
-if ~(obj.indelete || isvalid(obj)), return; end
+if ~(isvalid(obj) && obj.indelete), return; end
 
 if ~isempty(obj.content_listeners)
    hlistened = get(obj.content_listeners,{'Container'});
