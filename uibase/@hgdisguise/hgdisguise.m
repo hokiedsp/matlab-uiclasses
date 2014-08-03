@@ -103,25 +103,35 @@ classdef hgdisguise < uipanelautoresize
          %   that each object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         % if no H is given, explicitly give empty H to make sure that
-         % uipanelex constructor won't autoattach a panel.
          h = {};
-         if nargin==0 
-            h{1} = [];
-         elseif ~isempty(varargin{1})
+         nohg = nargin==0 || ~all(ishghandle(varargin{1})) ...
+            || (nargin>1 && all(cellfun(@isnumeric,varargin(1:2))));
+         if ~nohg % must have at least one input argument
             arg1 = varargin{1};
-            if (all(ishghandle(arg1)) && numel(unique(arg1))==numel(arg1))
-               h{1} = 'GraphicsHandle';
-            else
-               I = find(cellfun(@isnumeric,varargin),1,'last');
-               h = varargin(1:I);
-               varargin(1:I-1) = [];
-               varargin{1} = 'detached';
+            nohg = ~(all(ishghandle(arg1)) && numel(unique(arg1))==numel(arg1) ...
+               && (nargin==1||~isnumeric(varargin{2})));
+            
+            if ~nohg
+               % if H is given, prepend 'GraphicsHandle' so the uipanelex
+               % autoattach will not produe error due to incompatible HG type
+               if isscalar(arg1)
+                  h = {[] 1 1 'GraphicsHandle'};
+               else
+                  h = [{[]} num2cell(size(arg1)) {{'GraphicsHandle'}}];
+                  varargin{1} = num2cell(arg1(:));
+               end
             end
          end
+         if nohg && ~(nargin>1&&isempty(varargin{1}))
+            % if no H is given, explicitly give empty H to make sure that
+            % uipanelex constructor won't autoattach a panel.
+            h{1} = [];
+         end
          obj = obj@uipanelautoresize(h{:},varargin{:});
+         
       end
    end
+   
    methods (Access=protected)
       init(obj) % (overriding)
       validatehg(obj,h) % (overriding) to be validate that the HG object is supported by the class

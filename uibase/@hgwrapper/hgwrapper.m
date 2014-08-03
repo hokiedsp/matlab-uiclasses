@@ -98,10 +98,10 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
       attach(obj,h,varargin)
       h = detach(obj)
       tf = isattached(obj)
-
+      
       h = hgbase(obj) % return base HG object
       
-      % seal superclass functions 
+      % seal superclass functions
       varargout = get(obj,varargin)
       a = set(obj,varargin)
       function disp(obj), obj.disp@hgsetgetex(); end
@@ -118,6 +118,9 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
          %   HGWRAPPER creates a scalar HGWRAPPER object. Its associated HG object
          %   is also created and attached to the HGWRAPPER object.
          %
+         %   HGWRAPPER(H) creates HGWRAPPER objects for the HG handle objects given
+         %   in H and the created object has the same dimension as H.
+         %
          %   HGWRAPPER(N) creates an N-by-N matrix of HGWRAPPER objects
          %
          %   HGWRAPPER(M,N) creeates an M-by-N matrix of HGWRAPPER objects
@@ -126,9 +129,6 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
          %   M-by-N-by-P-by-... array of HGWRAPPER objects.
          %
          %   HGWRAPPER(SIZE(A)) creates HGWRAPPER objects with the same size as A.
-         %
-         %   HGWRAPPER(H) creates HGWRAPPER objects for the HG handle objects given
-         %   in H and the created object has the same dimension as H.
          %
          %   HGWRAPPER([],M,N,...) constructs detached HGWRAPPER object
          %   array.
@@ -146,34 +146,40 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
          
          narginchk(0,inf);
          
-         % if graphics handles are given, reformat input arguments
          if nargin>0
-            h = varargin{1};
-            if ~isempty(h) && all(ishghandle(h(:))) && numel(unique(h(:)))==numel(h)
-               sz = size(h);
+            if isempty(varargin{1}) % detached, no need to check for HG object argument
+               varargin(1) = []; % remove the first argument
+            elseif all(ishghandle(varargin{1}))
                
-               % if handles given, formulate property inputs to cell format
-               % and append handles as Graphics
-               if nargin==3 && iscell(varargin{2}) % (...,pn,pv)
-                  varargin = {sz,[{'GraphicsHandle'} varargin{2}] ...
-                     [num2cell(h(:)) varargin{3}]};
-               else
-                  varargin = {sz,[{'GraphicsHandle'} varargin(2:2:end)] ...
-                     [num2cell(h(:)) repmat(varargin(3:2:end),numel(h),1)]};
+               h = varargin{1};
+               
+               % if h is integer array & GraphicsHandle is not given in the
+               % property name-value pair arguments, treat it as the HG array.
+               % Else, treat it as the size array.
+               nothg = isnumeric(h) && all(h==floor(h)); % potentially not HG
+               if nothg
+                  pargs = hgsetgetex.unifyproppairs(varargin(2:end));
+                  if iscellstr(pargs{1})
+                     pnames = pargs(1:2:end);
+                  else
+                     pnames = pargs{1};
+                  end
+                  nothg = any(strcmp(pnames,'GraphicsHandle'));
                end
-            elseif isempty(h)
-               % ignore the first argument
-               varargin(1) = [];
+               
+               if ~nothg
+                  varargin = [{size(h),{'GraphicsHandle'},num2cell(h(:))},varargin(2:end)];
+               end
             end
          end
-         
+                  
          % initialize the object with set properties
          obj = obj@hgsetgetex(varargin{:});
-
+         
          % add the object to the instance manager
          if numel([obj.hg])~=numel(obj)
             hgwrapper.instance_manager('add',obj);
-         end      
+         end
       end
       
       function delete(obj) % destructor
@@ -206,7 +212,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
    end
    methods (Static=true,Access=protected)
       argin = autoattach(clsname,hgobj,types,argin) % explicit default constructor
-      [HgGiven,prt,vis,args] = getcritcalhgprops(args) % get parent and visible properties
+      [HgGiven,prt,vis,args] = getcritcalhgprops(args,Iend) % get parent and visible properties
    end
    methods (Access=protected)
       

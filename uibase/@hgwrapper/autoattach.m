@@ -28,7 +28,6 @@ function argin = autoattach(clsname,hgobj,supportedtypes,argin)
 %   unused ARGIN_ORIGINAL elements.
 
 Narg = numel(argin);
-
 if Narg>0
    h = argin{1}(:);
    % empty argument -> detached sclar object
@@ -36,7 +35,8 @@ if Narg>0
       return;
    end
    % check if HG handles are given as the first argument
-   if all(ishghandle(h)) && all(ishghandle(h)) && numel(unique(h))==numel(h)
+   if all(ishghandle(h)) && all(ishghandle(h)) && numel(unique(h))==numel(h) ...
+         && (Narg==1 || ~isnumeric(argin{2}))
       if isempty(supportedtypes), return; end % supports any type
       
       % make sure it is valid type
@@ -58,7 +58,6 @@ end
 
 % Step 2: Get object dimension
 [sz,Iend] = hgwrapper.getdimsinput(argin);
-argin(1:Iend) = [];
 
 % Step 3: Check if called with 'detached' option
 if ~isempty(argin) 
@@ -72,7 +71,7 @@ end
 
 % Step 4: Check if GraphicsHandle property is given
 %  Also look for 'parent' and 'visible' properties
-[HgGiven,prt,vis,argin] = hgwrapper.getcritcalhgprops(argin);
+[HgGiven,prt,vis,argin] = hgwrapper.getcritcalhgprops(argin,Iend);
 if HgGiven, return; end
 
 % Step 5: generate new HG object

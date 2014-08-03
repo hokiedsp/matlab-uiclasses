@@ -1,15 +1,15 @@
-function [HgGiven,prt,vis,args] = getcritcalhgprops(args)
+function [HgGiven,prt,vis,args] = getcritcalhgprops(args,Iend)
 % look for 'Parent' and 'Visible' properties
 
-% look for parent & visible properties
-Narg = numel(args);
-propincell = Narg==2 && all(cellfun(@iscell,args(1:2))); % ...,pn,pv)
-if propincell
-   pn = args{1};
-   pv = args{2};
-else % possibly line(X,Y,'P1Name',P1Value,'P2Name',P2Value,...)
-   pn = args(1:2:end);
-   pv = args(2:2:end);
+% convert all the property pair arguments to cell format
+[proppairs,cellprops] = hgsetgetex.unifyproppairs(args(Iend+1:end));
+
+if cellprops
+   pn = proppairs{1};
+   pv = proppairs{2};
+else
+   pn = proppairs(Iend+1:2:end);
+   pv = proppairs(Iend+2:2:end);
 end
 
 % check if GraphicsHandle is specified
@@ -50,7 +50,7 @@ else
    end
    
    % Remove the Parent & Visible properties from input arguments
-   if propincell
+   if cellprops
       args = {pn pv};
    else
       args = cell(1,numel(pn)+numel(pv));

@@ -80,37 +80,20 @@ elseif nargin==2 && ischar(varargin{1})% SET(H,'PropertyName')
 else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
    % Since the properties must be set in the order given, each property must
    % be set separately
-   
-   Nargs = numel(varargin);
-   n = 1;
-   while n<=Nargs % process one property at time
-      pname = varargin{n};
-      if isstruct(pname) %SET(H,S)
-         n = n + 1;
-         fnames = fieldnames(pname);
-         fvals = struct2cell(pname(:)).';
-         
-         for n = 1:numel(fnames)
-            name = fnames(n);
-            val = fvals(n);
-            try
-               set@hgsetgetex(obj,name,val);
-            catch ME
-               if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
-                  obj.sethgprop(name,val);
-               else
-                  ME.rethrow();
-               end
-            end
-         end
-      else
+
+   varargin = hgsetgetex.unifyproppairs(varargin);
+   if ischar(varargin{1}) %SET(H,'PropertyName',PropertyValue,...)
+      Nargs = numel(varargin);
+      n = 1;
+      while n<=Nargs % process one property at time
+         pname = varargin{n};
          if n==Nargs
             error('Invalid parameter/value pair arguments.');
          end
          pval = varargin{n+1};
          n = n + 2;
          
-         if ischar(pname) %SET(H,'PropertyName',PropertyValue)
+         if ischar(pname)
             try
                set@hgsetgetex(obj,pname,pval);
             catch ME
@@ -120,32 +103,33 @@ else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
                   ME.rethrow();
                end
             end
-         elseif iscell(pname) %SET(H,pn,pv)
-            Np = numel(pname);
-            if Np==0 && isempty(pval), continue; end
-            
-            try
-               validateattributes(pval,{'cell'},{'nrows',numel(obj),'ncols',Np});
-            catch
-               error('Invalid parameter/value pair arguments.');
-            end
-            
-            for k = 1:Np
-               name = pname(k);
-               val = pval(:,k);
-               
-               try
-                  set@hgsetgetex(obj,name,val);
-               catch ME
-                  if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
-                     obj.sethgprop(name,val);
-                  else
-                     ME.rethrow();
-                  end
-               end
+         end
+      end
+   else %SET(H,pn,pv)
+      pname = varargin{1};
+      pval = varargin{2};
+      Np = numel(pname);
+      if Np==0 && isempty(pval), return; end
+      
+      try
+         validateattributes(pval,{'cell'},{'nrows',numel(obj),'ncols',Np});
+      catch
+         error('Invalid parameter/value pair arguments.');
+      end
+      
+      for k = 1:Np
+         name = pname(k);
+         val = pval(:,k);
+         
+         try
+            set@hgsetgetex(obj,name,val);
+         catch ME
+            if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
+               obj.sethgprop(name,val);
+            else
+               ME.rethrow();
             end
          end
       end
    end
 end
-
