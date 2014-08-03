@@ -105,15 +105,21 @@ classdef hgdisguise < uipanelautoresize
          
          % if no H is given, explicitly give empty H to make sure that
          % uipanelex constructor won't autoattach a panel.
-         h = [];
-         if nargin>0
+         h = {};
+         if nargin==0 
+            h{1} = [];
+         elseif ~isempty(varargin{1})
             arg1 = varargin{1};
-            if isempty(h) || all(ishghandle(h(:)))
-               h = arg1;
-               varargin(1) = [];
+            if (all(ishghandle(arg1)) && numel(unique(arg1))==numel(arg1))
+               h{1} = 'GraphicsHandle';
+            else
+               I = find(cellfun(@isnumeric,varargin),1,'last');
+               h = varargin(1:I);
+               varargin(1:I-1) = [];
+               varargin{1} = 'detached';
             end
          end
-         obj = obj@uipanelautoresize(h,varargin{:});
+         obj = obj@uipanelautoresize(h{:},varargin{:});
       end
    end
    methods (Access=protected)

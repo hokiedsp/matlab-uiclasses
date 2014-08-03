@@ -21,7 +21,7 @@ obj.propopts.Parent = struct(...
 obj.nprops = 0; % clear just in case 
    
 % update nprops 
-obj.sortpropopts(4,false,false,true,true);
+obj.sortpropopts([],false,false,true,true);
 %sortpropopts(OBJ,Nsub,GROUP,SUB2TOP,MERGE,SORT)
 
 obj.hg_listener = handle([]);
