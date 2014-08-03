@@ -1,6 +1,6 @@
 classdef dialogex < uipanelautoresize
 %DIALOGEX   Extended dialog figure with OK/Cancel/Apply buttons.
-%   DIALOGEX is a HANDLE class derived from UIPANELAUTORESIZE to control a
+%   DIALOGEX is a HANDLE class derived from DIALOGEX to control a
 %   dialog figure. Its main feature are the control buttons: OK, Cancel,
 %   and Apply. The dialog can have any combination of these buttons, and
 %   their visibility, enabledness, and labels can be customized. Also, any
@@ -27,37 +27,37 @@ classdef dialogex < uipanelautoresize
 %     'Enter' or 'Space' key is pressed on the keyboard.
 %   - Pressing 'ESC' key or ctrl-'c' and closing the figure via X button
 %     are equivalent to pressing the 'Cancel' button.
-%   - Auto-Resize: Figure's ResizeFcn is automatically set up so that
+%   - Auto-Resize: Figure's ResizeFcn is automatically set up so that the
+%     control buttons are in the right location. AutoLayout property must
+%     be 'on' to activate this feature.
+%   - MinimumPanelSize property: Auto-ResizeFcn forces the figure size to
+%     be at least the size specified in this property.
+%   - Enable
 %
-%   UIPANELAUTORESIZE inherits and extends Enable property from its superclass,
-%   HGENABLE.
-%
-%   Unlike other uipanels, GraphicsHandle property and set/get interface
-%   of UIPANELAUTORESIZE connects to uicontrol and not the enclosing panel.
-%
-%   UIPANELAUTORESIZE properties.
+%   DIALOGEX properties.
 %      BeingClosed        - (read-only) ['on'|'off'] turns 'on' during ...
-%                           XxxButtonPressed events if XxxCloseDlg='on'.
+%                           XxxButtonPressed event if XxxCloseDlg='on'.
 %      ButtonBoxAlignment - ['left'|'center'|{'right'}] horizontal
 %                           alignment of the buttons
-%      ContentPanel % Handle to uipanel object to add user controls
-%      CloseRequestFcnMode % {'auto'}|'custom'
-%      WindowKeyPressFcnMode % {'auto'}|'custom' ('auto' closes figure when ctrl-c is pressed)
-%      ButtonOrder % [{'okcancelapply'},'okapplycancel','applyokcancel']
+%      ContentPanel          - Handle to uipanel object to add user controls
+%      CloseRequestFcnMode   - [{'auto'}|'manual']
+%      WindowKeyPressFcnMode - [{'auto'}|'manual']
+%      ButtonOrder  - [{'okcancelapply'},'okapplycancel','applyokcancel']
 %      
-%      DefaultBtn    % {'ok'}|'cancel'|'apply'|'none'
+%      DefaultBtn   - [{'ok'}|'cancel'|'apply'|'none'] default button
+%                     action when 'Enter' or 'Space' key is pressed.
 %      
-%      OkBtn         % Show/Enable OK button: {'on'}|'inactive'|'disable'|'off'
-%      OkBtnLabel    % OK button label: {'OK'}
-%      OkBtnCloseDlg % [{'on'}|'off'] Close dialog after triggering OkButtonPressed event
+%      OkBtn             - [{'on'}|'inactive'|'disable'|'off'] Show/Enable OK button
+%      OkBtnLabel        - {'OK'} OK button label
+%      OkBtnCloseDlg     - [{'on'}|'off'] Close dialog after triggering OkButtonPressed event
 %      
-%      CancelBtn      % Show/Enable Cancel button: {'on'}|'inactive'|'disable'|'off'
-%      CancelBtnLabel % Cancel button label: {'Cancel'}
-%      CancelBtnCloseDlg % [{'on'}|'off'] Close dialog after triggering CancelButtonPressed event
+%      CancelBtn         - [{'on'}|'inactive'|'disable'|'off'] Show/Enable Cancel button
+%      CancelBtnLabel    - {'Cancel'} Cancel button label
+%      CancelBtnCloseDlg - [{'on'}|'off'] Close dialog after triggering CancelButtonPressed event
 %      
-%      ApplyBtn % Show/Enable Cancel button: 'on'|'inactive'|'disable'|{'off'}
-%      ApplyBtnLabel  % Apply Button label: {'Apply'}
-%      ApplyBtnCloseDlg % [{'on'}|'off'] Close dialog after triggering OkButtonPressed event
+%      ApplyBtn         - [{'on'}|'inactive'|'disable'|'off'] Show/Enable Apply button
+%      ApplyBtnLabel    - {'Cancel'} Apply button label
+%      ApplyBtnCloseDlg - [{'on'}|'off'] Close dialog after triggering ApplyButtonPressed event
 %
 %      AutoDetach       - Simultaneous deletion of HG object
 %      AutoLayout       - [{'on'}|'off'] to re-layout panel automatically
@@ -66,12 +66,14 @@ classdef dialogex < uipanelautoresize
 %      Extent          - (Read-only) tightest position rectangel encompassing all Children
 %      HGDetachable    - (Read-only) Indicate whether attach/detach can be called
 %      GraphicsHandle  - Attached HG object handle
+%      MinimumPanelSize - [width height] in pixels to force the minimum
+%                         panel size.
 %      ResizeFcnMode   - {'manual','auto'}
 %
-%   UIPANELAUTORESIZE methods:
-%   UIPANELAUTORESIZE object construction:
-%      @UIPANELAUTORESIZE/UIPANELAUTORESIZE   - Construct UIPANELAUTORESIZE object.
-%      delete                 - Delete UIPANELAUTORESIZE object.
+%   DIALOGEX methods:
+%   DIALOGEX object construction:
+%      @DIALOGEX/DIALOGEX   - Construct DIALOGEX object.
+%      delete                 - Delete DIALOGEX object.
 %
 %   HG Object Association:
 %      attach                 - Attach HG panel-type object.
@@ -79,17 +81,15 @@ classdef dialogex < uipanelautoresize
 %      isattached             - True if HG object is attached.
 %
 %   HG Object Control:
+%      cancelDialogClosure  - Cancel pending dialog closure.
 %      enable               - Enable the panel content
 %      disable              - Disable the panel content
 %      inactivate           - Inactivate (visually on, functionally off)
 %                             the panel content.
 %
 %   Getting and setting parameters:
-%      get              - Get value of UIPANELAUTORESIZE object property.
-%      set              - Set value of UIPANELAUTORESIZE object property.
-%
-%   Static methods:
-%      ispanel          - true if HG object can be wrapped by UIPANELAUTORESIZE
+%      get              - Get value of DIALOGEX object property.
+%      set              - Set value of DIALOGEX object property.
    
    events
       OkButtonPressed
@@ -143,7 +143,6 @@ classdef dialogex < uipanelautoresize
    
    methods
       cancelDialogClosure(obj) % call this method during OkButtonPressed or CancelButtonPressed event callback to abort figure closure
-      pressDefaultButton(obj) % call this method to trigger the action associated with the default button
       function obj = dialogex(varargin)
          %DIALOGEX/DIALOGEX() instantiates DIALOGEX class
          %
