@@ -29,17 +29,16 @@ if isa(h,'hgwrapper')
 else
    hg = h;
 end
-if all(ishghandle(hg))
-   [tf,I] = ismember(handle(hg),obj.elem_h);
-else
+
+[tf,I] = ismember(handle(hg(:)),obj.elem_h);
+if ~all(tf)
    % subscripts given, get elements at the specified cells
    validateattributes(hg,{'numeric'},{'2d','ncols',2,'positive','integer','finite'});
    [tf,I] = ismember(hg,obj.elem_subs,'rows');
+   if ~all(tf(:))
+      error('Invalid element or cell subscripts.');
+   end
    h = obj.elem_h(I);
-end
-
-if ~all(tf)
-   error('Invalid element or cell subscripts.');
 end
 
 if mod(nargin,2)~=0

@@ -41,7 +41,7 @@ set(H(~tf),'Parent',obj.GraphicsHandle);
 
 % set properties
 if nargin>2
-   obj.setelement(H,varargin{:});
+   obj.setElement(H,varargin{:});
 end
 
 % reset AutoLayout flag
