@@ -60,7 +60,7 @@ end
 if nargin==1 % A = SET(H)
    a = set@hgsetgetex(obj);
    if obj.isattached()
-      a_hg = obj.sethgprop();
+      a_hg = sethgprop(obj);
       anames = fieldnames(a_hg);
       for n = 1:numel(anames)
          aname = anames{n};
@@ -75,7 +75,7 @@ elseif nargin==2 && ischar(varargin{1})% SET(H,'PropertyName')
    try
       a = set@hgsetgetex(obj,pname);
    catch
-      a = obj.sethgprop(pname);
+      a = sethgprop(obj,pname);
    end
 else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
    % Since the properties must be set in the order given, each property must
@@ -98,7 +98,7 @@ else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
                set@hgsetgetex(obj,pname,pval);
             catch ME
                if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
-                  obj.sethgprop(pname,pval);
+                  sethgprop(obj,pname,pval);
                else
                   ME.rethrow();
                end
@@ -125,11 +125,42 @@ else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
             set@hgsetgetex(obj,name,val);
          catch ME
             if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
-               obj.sethgprop(name,val);
+               sethgprop(obj,name,val);
             else
                ME.rethrow();
             end
          end
       end
    end
+end
+
+end
+
+function a = sethgprop(obj,name,val)
+%HGWRAPPER/SETHGPROP   Helper function for SET method
+%   SETHGPROP(OBJ,NAME,VAL) sets the value of OBJ's property with its
+%   name given in NAME as VAL.
+%
+%   A = SETHGPROP(OBJ,NAME) returns the possible values for the property
+%   specified by NAME.
+
+if nargin<2
+   a = set(obj.hg);
+elseif nargin<3 % return
+   try
+      a = set([obj.hg],pname);
+   catch
+      error('The name ''%s'' is not an accessible property for an instance of class ''%s''.',pname,class(obj));
+   end
+else
+   try
+      set([obj.hg],name,val);
+   catch ME
+      if strcmp(ME.identifier,'MATLAB:class:InvalidProperty')
+         error('The name ''%s'' is not an accessible property for an instance of class ''%s''.',char(name),class(obj));
+      else
+         error('Bad property value found.\nObject Name: %s\nProperty Name: ''%s''\nError Message: %s',class(obj),char(name),ME.message);
+      end
+   end
+end
 end

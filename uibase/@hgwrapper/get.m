@@ -66,7 +66,7 @@ if nargin==2 % property name(s) given
       if ~all(obj.isattached())
          error('Not accessible properties for an detached instance of class ''%s''.',class(obj));
       else
-         v(:,tf) = obj.gethgprops(pnames(tf));
+         v(:,tf) = gethgprops(obj,pnames(tf));
       end
    end
    
@@ -79,7 +79,7 @@ else % all properties
    if nargout>0 % return struct full of property values
       f1 = properties(obj);
       v1 = obj.get@hgsetgetex(f1).';
-      [v2,f2] = obj.gethgprops();
+      [v2,f2] = gethgprops(obj);
       
       [f2,I] = setdiff(f2,f1,'stable');
       fnames = cat(1,f1,f2);
@@ -90,4 +90,26 @@ else % all properties
    end
 end
 
+end
+
+function [vals,names] = gethgprops(obj,names)
+%HGWRAPPER/GETPROPS   Helper function for GET method
+%   VALS = GETHGPROPS(OBJ,NAMES) returns the values of OBJ's properties
+%   with their names given in NAME cellstr array.
+%
+%   [VALS,NAMES] = GETHGPROPS(OBJ) returns values and names of all the
+%   properties of the attached HG object
+
+if nargin<2
+   v = get(obj.hg);
+   if isempty(v)
+      vals = {};
+      names = {};
+   else
+      names = fieldnames(v);
+      vals = struct2cell(v);
+   end
+else
+   vals = get([obj.hg],names);
+end
 end
