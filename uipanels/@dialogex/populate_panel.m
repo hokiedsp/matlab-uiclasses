@@ -16,8 +16,8 @@ obj.pnButtonBox.attach(hbbox);
 % create buttons
 obj.hBtns = [
    uicontrol(hbbox,'Style','pushbutton','Visible',obj.btnvis{1},'Enable',obj.btnena{1},'Callback',@(~,~)obj.btncallback(1))
-   uicontrol(hbbox,'Style','pushbutton','Visible',obj.btnvis{2},'Enable',obj.btnena{2},'Callback',@(~,~)obj.btncallback(1))
-	uicontrol(hbbox,'Style','pushbutton','Visible',obj.btnvis{3},'Enable',obj.btnena{3},'Callback',@(~,~)obj.btncallback(1))
+   uicontrol(hbbox,'Style','pushbutton','Visible',obj.btnvis{2},'Enable',obj.btnena{2},'Callback',@(~,~)obj.btncallback(2))
+	uicontrol(hbbox,'Style','pushbutton','Visible',obj.btnvis{3},'Enable',obj.btnena{3},'Callback',@(~,~)obj.btncallback(3))
    ];
 obj.setdefaultbutton();
 

@@ -3,7 +3,7 @@ function btncallback(obj,I)
 %   BTNCALLBACK(OBJ,I,eventname)
 
 if nargin==1 % default button action
-   if obj.default_mode==1, return;
+   if obj.default_mode==1, return; % no default button set
    else I = obj.default_mode-1;
    end
 end

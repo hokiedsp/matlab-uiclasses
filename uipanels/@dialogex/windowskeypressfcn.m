@@ -6,12 +6,19 @@ switch(event.Key)
    case {'return','space'}
       % if current focus is on a edit uicontrol, ignore space key and also
       % return key if multi-line edit
+      I = obj.default_mode-1;
       o = get(h,'CurrentObject');
-      if ~isempty(o) && strcmp(get(o,'Type'),'uicontrol') && strcmp(get(o,'Style'),'edit') ...
+      if obj.default_mode==0 || ~isempty(o) && strcmp(get(o,'Type'),'uicontrol') ...
+            && strcmp(get(o,'Style'),'edit') ...
             && (event.Key(1)=='s' || (event.Key(1)=='r' && (get(o,'Max')-get(o,'Min'))>1))
          return;
       end
-         
+      
+      % perform button callback only if the actual button is visible and enabled
+      if ~(strcmp(obj.btnvis{I},'on') && strcmp(obj.btnena{I},'on'))
+         return;
+      end
+      
       % perform the callback of the default button
       obj.btncallback();
       
