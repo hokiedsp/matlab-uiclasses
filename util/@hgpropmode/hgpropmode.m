@@ -100,6 +100,7 @@ classdef hgpropmode < hgsetgetex
       init(obj) % (overriding)
       argin = processargin(obj,argin)
       prop_postsetfcn(obj) % event listener callback function
+      update_default(obj) % if property value is unchanged and DefaultValue changed
    end
    methods
       function val = get.Enabled(obj)
@@ -118,6 +119,10 @@ classdef hgpropmode < hgsetgetex
             obj.validateproperty('Enabled',val);
             set(obj.lis_prop_postset,'Enabled',val);
          end
+      end
+      function set.DefaultValue(obj,val)
+         obj.DefaultValue = val;
+         obj.update_default();
       end
    end
 end
