@@ -19,6 +19,8 @@ classdef uiflowgridcontainer < uipanelautoresize
    %                            elements in pixels
    %      VerticalAlignment   - 'bottom'|'middle'|{'top'}
    %      EliminateEmptySpace - ['on'|'off'] empty grid rows/columns are eliminated 
+   %      HorizontalWeight    - [positive val or NaN] Column width distribution weights
+   %      VerticalWeight      - [positive val or NaN] Row height distribution weights
    %
    %      Elements            - children HG objects in grid
    %      ElementsHeightLimits - height limits in pixels, each row: [min max]
@@ -67,6 +69,10 @@ classdef uiflowgridcontainer < uipanelautoresize
    %
    %   Static methods:
    %      ispanel          - true if HG object can be wrapped by UIFLOWGRIDCONTAINER
+   properties
+      HorizontalWeight    % [positive val or NaN] Column width distribution weights
+      VerticalWeight      % [positive val or NaN] Row height distribution weights
+   end
    properties (Dependent,SetAccess=private)
       NumberOfElements
    end
@@ -98,6 +104,8 @@ classdef uiflowgridcontainer < uipanelautoresize
       halign     % horizontal alignment of grid wrt panel
       valign     % vertical alignment of grid wrt panel
       elimempty  % true to eliminate empty row/column
+      hweight
+      vweight
       
       elem_h       % HG objects to be included
       elem_wlims   % elements' width limits
@@ -173,7 +181,7 @@ classdef uiflowgridcontainer < uipanelautoresize
       end
    end
    methods (Access=protected)
-      function types = supportedtypes(obj) % supported HG object types
+      function types = supportedtypes(~) % supported HG object types
          % override this function to limit object types
          types = {'figure','uipanel','uicontainer','uitab'};
       end
@@ -185,6 +193,7 @@ classdef uiflowgridcontainer < uipanelautoresize
       update_grid(obj) % update obj.map to reflect changes in GridSize, ElementsLocation
       
       [col_wlims,row_hlims,Ivis,subs] = format_grid(obj)
+      [val,doresize] = set_weight(obj,private_prop,I,val)
       
       register_element(obj,h)   % ObjectChildAdded event callback
       unregister_element(obj,h) % ObjectChildRemoved event callback
@@ -195,7 +204,6 @@ classdef uiflowgridcontainer < uipanelautoresize
       subs = nextcellsubs(obj,Nadd) % get the next available unoccupied grid cells
 
       val = get_contentextent(obj,h) % Returns size of panel content
-      
       validategridsize(obj,val)
    end
    
@@ -394,7 +402,7 @@ classdef uiflowgridcontainer < uipanelautoresize
          if isempty(obj.elem_h)
             val = {};
          else
-            val = obj.elem_halign_opts(obj.elem_halign+1);
+            val = obj.elem_halign_opts(obj.elem_halign);
          end
       end
       function set.ElementsHorizontalAlignment(obj,val)
@@ -411,7 +419,7 @@ classdef uiflowgridcontainer < uipanelautoresize
          if isempty(obj.elem_h)
             val = [];
          else
-            val = obj.elem_valign_opts(obj.elem_valign+1);
+            val = obj.elem_valign_opts(obj.elem_valign);
          end
       end
       function set.ElementsVerticalAlignment(obj,val)
@@ -435,12 +443,34 @@ classdef uiflowgridcontainer < uipanelautoresize
       % EliminateEmptySpace - 'on' to eliminate rows & columns with no
       % element
       function val = get.EliminateEmptySpace(obj)
-         val = obj.propopts.EliminateEmptySpace.StringOptions{2-obj.autoexpand};
+         val = obj.propopts.EliminateEmptySpace.StringOptions{2-obj.elimempty};
       end
       function set.EliminateEmptySpace(obj,val)
          [~,val] = obj.validateproperty('EliminateEmptySpace',val);
          obj.elimempty = logical(2-val);
          obj.layout_panel();
       end
-   end      
+      
+      %HorizontalWeight - [positive val or NaN] Column width distribution weights
+      function set.HorizontalWeight(obj,val)
+         obj.validateproperty('HorizontalWeight',val);
+         [obj.HorizontalWeight,resize] = obj.set_weight('hweight',2,val);
+         if resize
+            obj.update_grid(); % grid size changed, update the grid mapping first
+         else
+            obj.layout_panel(); % just layout
+         end
+      end
+      
+      %VerticalWeight - [positive val or NaN] Row height distribution weights
+      function set.VerticalWeight(obj,val)
+         obj.validateproperty('VerticalWeight',val);
+         [obj.VerticalWeight,resize] = obj.set_weight('vweight',1,val);
+         if resize
+            obj.update_grid(); % grid size changed, update the grid mapping first
+         else
+            obj.layout_panel(); % just layout
+         end
+      end
+   end
 end

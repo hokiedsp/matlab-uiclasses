@@ -5,18 +5,33 @@ function update_grid(obj)
 %   or indirectly. UPDATE_GRID updates OBJ.map private property, which
 %   carries information on which cell is occupied by which element.
 
-if isempty(obj.elem_h)
-   obj.map = zeros(obj.gridsize);
-   return;
-end
+% Initialize grid map to zeros
+obj.map = zeros(obj.gridsize);
 
 % Make sure the grid is large enough for all its elements
-obj.gridsize(:) = max(obj.gridsize,max(obj.elem_subs + obj.elem_span - 1));
+if ~isempty(obj.elem_h)
+   obj.gridsize(:) = max(obj.gridsize,max(obj.elem_subs + obj.elem_span - 1));
+end
+
+% Check & update weight vectors
+al = obj.autolayout;
+obj.autolayout = false;
+N = numel(obj.vweight);
+if N~=obj.gridsize(1)
+   vweight = obj.VerticalWeight;
+   vweight(obj.gridsize(1)+1:end) = [];
+   obj.VerticalWeight = vweight;
+end
+N = numel(obj.hweight);
+if N~=obj.gridsize(2)
+   hweight = obj.HorizontalWeight;
+   hweight(obj.gridsize(2)+1:end) = [];
+   obj.HorizontalWeight = hweight;
+end
+obj.autolayout = al;
 
 % Recreate the grid map
-N = numel(obj.elem_h);
-obj.map = zeros(obj.gridsize);
-for n = 1:N
+for n = 1:numel(obj.elem_h)
    % get columns & rows that the element occupies
    I = obj.elem_subs(n,1):(obj.elem_subs(n,1)+obj.elem_span(n,1)-1);
    J = obj.elem_subs(n,2):(obj.elem_subs(n,2)+obj.elem_span(n,2)-1);

@@ -46,6 +46,11 @@ obj.propopts.VerticalAlignment = struct(...
 obj.propopts.EliminateEmptySpace = struct(...
    'StringOptions',{{'on','off'}},...
    'Default','off');
+obj.propopts.HorizontalWeight = struct(...
+   'OtherTypeValidator',@(val)validate_weight(val,'HorizontalWeight'));
+obj.propopts.VerticalWeight = struct(...
+   'OtherTypeValidator',@(val)validate_weight(val,'VerticalWeight'));
+
 obj.propopts.Elements = struct(...
    'OtherTypeValidator',@(val)isempty(setdiff(h,get(obj.hg,'Children'))));
 obj.propopts.ElementsHeightLimits = struct(...
@@ -70,4 +75,12 @@ validateattributes(val,{'cell'},{'numel',numel(obj.elem_h)});
 val = cellfun(@(v)validatestring(v,opts),val,'UniformOutput',false);
 [~,val] = ismember(val,opts);
 val = val - 1;
+end
+
+function validate_weight(val,name)
+validateattributes(val,{'numeric'},{'positive'},'set',name);
+if any(isinf(val))
+   error('%s values must be finite or NaN.');
+end
+
 end

@@ -28,8 +28,8 @@ mout(4) = mout(4) + sum(bmargin([3 4]));
 try
    % compute the column widths and row heights
    pos = get(obj.hg,'Position');
-   [X0,Wcol] = layout_grid(size(col_wlims,1),col_wlims,pos(3),obj.inmargin(1),mout([1 2]));
-   [Y0,Hrow] = layout_grid(size(row_hlims,1),row_hlims,pos(4),obj.inmargin(2),mout([4 3]));
+   [X0,Wcol] = layout_grid(size(col_wlims,1),col_wlims,obj.hweight,pos(3),obj.inmargin(1),mout([1 2]));
+   [Y0,Hrow] = layout_grid(size(row_hlims,1),row_hlims,obj.vweight,pos(4),obj.inmargin(2),mout([4 3]));
    
    % record the excess space on the panel
    dX = (pos(3) - X0(end));
@@ -104,7 +104,7 @@ set(obj.content_listeners,{'Enabled'},lisena);
 
 end
 
-function [d_origin,d_size] = layout_grid(N,lims,total,inmargin,outmargin)
+function [d_origin,d_size] = layout_grid(N,lims,weight,total,inmargin,outmargin)
 %layout_grid(map,elem_lims,total,margin,autosize)
 %   map - size==gridsize, cell occupied by indexed element
 %   lims - [min max] of each grid cell
@@ -113,27 +113,29 @@ function [d_origin,d_size] = layout_grid(N,lims,total,inmargin,outmargin)
 %   autosize - true if distribute cells
 
 total = total - (N-1)*inmargin - sum(outmargin);
-totalmin = sum(lims(:,1)); % minimum required space to fit everything at their minimum size
-totalmax = sum(lims(:,2)); % maximum required space to fit everything at their maximum size
-if totalmin>=total % panel too small, let it overflow
+if sum(lims(:,1))>=total % panel too small, let it overflow
    d_size = lims(:,1);
-elseif totalmax<=total % too much room, max size
+elseif sum(lims(:,2))<=total % too much room, max size
    d_size = lims(:,2);
 else % somewhere in between
-   
-   d_size = total*lims(:,1)/totalmin; % weighted scaling according to the minimum size
-   I = d_size>lims(:,2); % check if any cell is larger than its max
+   d_size = total*weight/sum(weight);
+   I2small = d_size<lims(:,1);
+   I2big = d_size>lims(:,2); % check if any cell is larger than its max
+   I = (I2small|I2big);
    while any(I)
       % violating member to their max
-      d_size(I) = lims(I,2);
-      totalmaxed = sum(d_size(I));
+      d_size(I2small) = lims(I2small,1);
+      d_size(I2big) = lims(I2big,2);
+      total = total - sum(d_size(I));
       
       % distribute the excess among the non-violating members
       I(:) = ~I;
-      d_size(I) = total*lims(I,1)/(totalmin-totalmaxed);
+      w = weight(I);
+      d_size(I) = total*w/sum(w);
       
-      % check again
-      I = d_size>lims(:,2);
+      I2small = d_size<lims(:,1);
+      I2big = d_size>lims(:,2); % check if any cell is larger than its max
+      I = I2small|I2big;
    end
 end
 
