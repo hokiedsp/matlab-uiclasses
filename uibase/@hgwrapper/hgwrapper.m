@@ -240,7 +240,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
          end
       end
       
-      function types = supportedtypes(obj) % supported HG object types
+      function types = supportedtypes(~) % supported HG object types
          % override this function to limit object types
          types = {};
       end

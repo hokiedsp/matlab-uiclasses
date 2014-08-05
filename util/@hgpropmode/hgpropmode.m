@@ -48,6 +48,9 @@ classdef hgpropmode < hgsetgetex
    properties
       DefaultValue     % default property name
    end
+   properties (Dependent)
+      Enabled          % listener enable state
+   end
    properties (Access=private)
       lis_destroy       % listens to hg object destruction
       lis_prop_postset  % listens to property value change
@@ -97,5 +100,24 @@ classdef hgpropmode < hgsetgetex
       init(obj) % (overriding)
       argin = processargin(obj,argin)
       prop_postsetfcn(obj) % event listener callback function
+   end
+   methods
+      function val = get.Enabled(obj)
+         if isempty(obj.lis_prop_postset)
+            val = '';
+         else
+            val = get(obj.lis_prop_postset,'Enabled');
+         end
+      end
+      function set.Enabled(obj,val)
+         if isempty(obj.lis_prop_postset)
+            if ~isempty(val)
+               error('Enabled can be set only if SourceHandle is defined.');
+            end
+         else
+            obj.validateproperty('Enabled',val);
+            set(obj.lis_prop_postset,'Enabled',val);
+         end
+      end
    end
 end

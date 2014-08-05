@@ -11,3 +11,5 @@ obj.valchg = false;
 obj.propopts.GraphicsHandle = struct([]);
 obj.propopts.PropertyName = struct([]);
 obj.propopts.DefaultValue = struct([]);
+obj.propopts.Enabled = struct(...
+   'StringOptions',{{'on','off'}});

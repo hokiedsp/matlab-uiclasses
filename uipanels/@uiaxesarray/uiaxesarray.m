@@ -92,6 +92,12 @@ classdef uiaxesarray < uiflowgridcontainer
 %    - (Dec. 11, 2013) - Initial release
 
    properties
+      
+      XScroll % ['on',{'off'}]
+      XScrollMode % ['allaxes' 'leftcolumn' 'rightcolumn']
+      YScroll % ['on',{'off'}]
+      YScrollMode % ['allaxes' 'bottomrow' 'toprow']
+      
       XLimLinkedColumns
       YLimLinkedRows
    end
@@ -99,6 +105,9 @@ classdef uiaxesarray < uiflowgridcontainer
       IncludeLabels      % [{'on'}|'off'] 'on' to fit the axes and its text labels within grid cell
    end
    properties (Access=protected)
+      
+      hscroll
+      
       inclabel
       xlink_listeners
       ylink_listeners
