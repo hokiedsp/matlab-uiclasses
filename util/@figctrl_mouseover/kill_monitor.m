@@ -3,7 +3,7 @@ function kill_monitor(obj,h)
 %deleted.
 
 % kill & remove the listener
-l = findobj(obj.content_listeners,'flat','Container',h,'Callback',obj.killfcn);
+l = findobj(obj.el,'flat','Container',h,'Callback',obj.killfcn);
 I = obj.el==handle(l);
 delete(obj.el(I));
 

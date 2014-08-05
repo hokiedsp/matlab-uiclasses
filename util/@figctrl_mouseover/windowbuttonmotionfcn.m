@@ -21,7 +21,7 @@ end
 if miss || isempty(I) % nothing hit
    if obj.hit>0 % previously hit
       obj.hit = 0;
-      set(obj.hg,obj.ptrstyle{:}); % revert pointer style to the default
+      set(fig,obj.ptrstyle{:}); % revert pointer style to the default
    end
 else % obj.h(I) hit
    % set pointer style
