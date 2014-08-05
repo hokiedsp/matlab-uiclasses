@@ -26,7 +26,7 @@ classdef uipanelex < hgenable
 %      Enable           - Enable or disable the panel and its contents
 %      EnableMonitoring - [{'on'}|'off'] to enable monitoring of panel
 %                         descendents
-%      Extent           - (Read-only) tightest position rectangel encompassing all Children
+%      Extent           - (Read-only) tightest position rectangle encompassing all Children
 %      HGDetachable     - (Read-only) Indicate whether attach/detach can be called
 %      GraphicsHandle   - Attached HG object handle
 %
