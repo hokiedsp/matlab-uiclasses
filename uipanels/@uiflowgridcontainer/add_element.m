@@ -48,4 +48,4 @@ obj.elem_valign(Inew,1) = 2; % 'middle'
 
 % add listener to remove the element automatically from the grid
 % structure when it is destroyed
-obj.content_listeners(end+1) = addlistener(h,'ObjectBeingDestroyed',@(~,~)obj.register_element(h,false));
+obj.content_listeners(end+1) = addlistener(h,'ObjectBeingDestroyed',@(~,~)obj.unregister_element(h));
