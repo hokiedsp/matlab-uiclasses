@@ -233,7 +233,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
             if obj.autodetach
                obj.detach();
                notify(obj,'HGDeleted');
-            else
+            elseif isvalid(obj)
                obj.autodetach = true;
                delete(obj);
             end
