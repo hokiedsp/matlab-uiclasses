@@ -65,8 +65,8 @@ for n = i1:Nel % for each element with cell spanning
    elem_lims(n,:) = elem_lims(n,:) - margin*(elem_span(n)-1);
    
    loc = find(any(map==n,1));
-   dmin_n = dmin(loc);
-   dspan_min = sum(dmin_n);
+   dmin_n = dmin(loc); % current minimum size for the spanned columns/rows
+   dspan_min = sum(dmin_n); % total minimum size spanned over the columns/rows
    if elem_lims(n,1) > dspan_min % takes more length than current minimum
       
       for i = loc % for each grid position
@@ -89,15 +89,16 @@ for n = i1:Nel % for each element with cell spanning
       for i = loc % for each grid position (over which the cell element spans)
          d = dmin_n;
          d(i) = [];
-         dsum = sum(d);
-         if dmax_n(i)+dsum>elem_lims(n,2)
+         dsum = sum(d); % minimum span w/o i-th row/col
+         if dmax_n(i)+dsum < elem_lims(n,2) % more rooms available than required for the element
             dmax_n(i) = elem_lims(n,2)-dsum;
          end
       end
-      dmax(loc) = dmax_n;
+      dmax(loc) = min(dmax(loc),dmax_n);
    end
 end
 
+dmax(dmax==0) = inf; % zero means no element
 dlim = [dmin(:) dmax(:)];
 
 end
