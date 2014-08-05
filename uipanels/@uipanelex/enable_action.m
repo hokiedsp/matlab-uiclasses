@@ -38,32 +38,36 @@ function traverse_hgtree(obj,h,val)
 
 % first process
 [hgws,I] = hgwrapper.findobj(h);
-ishgenable = false(size(I));
+nothgenable = false(size(I));
 N = numel(obj.d_hgws);
 for n = 1:numel(hgws)
-   try % to save current Enable value
-      ena = hgws(n).Enable;
-      obj.d_hgw_states{N+1} = ena;
-      
-      % if success, proceed set Enable to match the panel's 
-      % ... unless panel is inactive and obj is disabled
-      if ~(strcmp(val,'inactive') && strcmp(ena,'off'))
-         hgws(n).Enable = val;
-      end
-      
-      % filling in the rest of the information
-      ishgenable(n) = true;
-      N = N + 1;
-      obj.d_hgws(N) = hgws(n);
-      obj.d_hgw_listeners(N) = addlistener(hgws(n),'Enable','PostSet',...
-         @(~,~)obj.d_update(N,false));
-   catch ME
-      ME.rethrow();
+   
+   % must be hgenable (or its derivatives)
+   if ~isa(hgws(n),'hgenable')
+      nothgenable(n) = true;
+      continue;
    end
+   
+   N = N + 1;
+   
+   % to save current Enable value
+   ena = hgws(n).Enable;
+   obj.d_hgw_states{N} = ena;
+   
+   % if success, proceed set Enable to match the panel's
+   % ... unless panel is inactive and obj is disabled
+   if ~(strcmp(val,'inactive') && strcmp(ena,'off'))
+      hgws(n).Enable = val;
+   end
+   
+   % filling in the rest of the information
+   obj.d_hgws(N) = hgws(n);
+   obj.d_hgw_listeners(N) = addlistener(hgws(n),'Enable','PostSet',...
+      @(~,~)obj.d_update(N,false));
 end
 
 % remove HG objects with hgenable from h
-I(~ishgenable) = [];
+I(nothgenable) = [];
 if ~isempty(I)
    h(I) = [];
 end
