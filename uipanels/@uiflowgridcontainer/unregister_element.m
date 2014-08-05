@@ -6,5 +6,7 @@ function unregister_element(obj,h)
 %   utilized as the callback method for ObjectChildAdded and
 %   ObjectChildRemoved events.
 
+if ~isvalid(obj), return; end
+
 obj.remove_elements(h);
 obj.update_grid();

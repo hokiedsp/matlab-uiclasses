@@ -3,6 +3,8 @@ function remove_elements(obj,h)
 %   REMOVE_ELEMENTS(OBJ,H) removes the HG objects H from the grid defined
 %   by OBJ. This function does not call update_grid().
 
+if ~isvalid(obj), return; end
+
 [hremoved,I] = intersect(obj.elem_h,handle(h));
 if isempty(hremoved), return; end
 
