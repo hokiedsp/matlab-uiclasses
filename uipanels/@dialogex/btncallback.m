@@ -25,23 +25,23 @@ if obj.btnclose(I)
    obj.BeingClosed = 'on';
 end
 
-try
-   % trigger the event (assuming notify blocks the function call until all
-   % its listeners complete their callbacks)
-   notify(obj,eventname);
-   
-   % if BeingClosed is still 'on', close the figure
-   % (event can call OBJ.cancelDialogClosure() method to cancel it)
-   if obj.BeingClosed(2)=='n'
-      delete(obj.hg); % direct deletion to avoid triggering CloseRequestFcn 
-   end
-   
-   % if OBJ is still valid (if AutoDetach='off', OBJ is deleted at this
-   % point) clear BeingClosed flag.
-   if autodetach
-      obj.BeingClosed = 'off';
-   end
-catch ME
+obj.Enable = 'inactive';
+set(obj.hg,'Pointer','watch');
+
+% trigger the event (assuming notify blocks the function call until all
+% its listeners complete their callbacks)
+notify(obj,eventname);
+
+% if BeingClosed is still 'on', close the figure
+% (event can call OBJ.cancelDialogClosure() method to cancel it)
+if obj.BeingClosed(2)=='n'
+   delete(obj.hg); % direct deletion to avoid triggering CloseRequestFcn
+end
+
+% if OBJ is still valid (if AutoDetach='off', OBJ is deleted at this
+% point) clear BeingClosed flag.
+if autodetach
    obj.BeingClosed = 'off';
-   rethrow(ME);
+   obj.Enable = 'on';
+   set(obj.hg,'Pointer','arrow');
 end
