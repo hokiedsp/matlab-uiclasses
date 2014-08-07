@@ -43,6 +43,7 @@ if ~all(obj.isvalid())
 end
 
 if nargin==2 % property name(s) given
+
    pisch = ischar(varargin{1});
    if pisch
       pnames = varargin(1);
@@ -54,6 +55,31 @@ if nargin==2 % property name(s) given
    
    M = numel(obj);
    v = cell(M,N); % property value to output
+   
+   if M>1
+      % Heterogenerous Array Support: get operation fails if an HGWRAPPER
+      % class overrides an HG object property while another class in the
+      % array does not override the property. This code segment makes sure
+      % that the proper property value is returned
+      
+      % identify all classes in OBJ
+      classnames = cell(M,1);
+      for n = 1:M
+         classnames{n} = class(obj(n));
+      end
+      [classnames,~,I] = unique(classnames);
+      K = numel(classnames);
+      if K>1
+         % if heterogenous, call get for each class separately
+         for k = 1:K
+            idx = I==k;
+            v(idx,:) = get(obj(idx),pnames);
+         end
+         varargout{1} = v;
+         return;
+      end
+   end
+   
    objpnames = properties(obj);
    [tf,J] = ismember(lower(pnames),lower(objpnames));   % true if HGWRAPPER object properties
    

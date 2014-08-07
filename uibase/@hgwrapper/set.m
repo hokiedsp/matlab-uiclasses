@@ -82,6 +82,36 @@ else % SET(H,'PropertyName',PropertyValue), SET(H,pn,pv), SET(H,S)
    % be set separately
 
    varargin = hgsetgetex.unifyproppairs(varargin);
+   
+   M = numel(obj);
+   if M>1
+      % Heterogenerous Array Support: set operation fails if an HGWRAPPER
+      % class overrides an HG object property while another class in the
+      % array does not override the property. This code segment makes sure
+      % that the proper property value is returned
+      
+      % identify all classes in OBJ
+      classnames = cell(M,1);
+      for n = 1:M
+         classnames{n} = class(obj(n));
+      end
+      [classnames,~,I] = unique(classnames);
+      K = numel(classnames);
+      if K>1
+         % if heterogenous, call get for each class separately
+         for k = 1:K
+            idx = I==k;
+            if ischar(varargin{1}) % same property value to all objects
+               set(obj(idx),varargin{:});
+            else % different value for each object
+               set(obj(idx),varargin{1},varargin{2}(idx,:));
+            end
+         end
+         return;
+      end
+   end
+
+   
    if ischar(varargin{1}) %SET(H,'PropertyName',PropertyValue,...)
       Nargs = numel(varargin);
       n = 1;
