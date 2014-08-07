@@ -61,6 +61,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
    %
    %   HG Object Association:
    %      attach                 - Attach HG object.
+   %      copyattach             - Attach copyied HG object.
    %      detach                 - Detach HG object.
    %      isattached             - True if HG object is attached.
    %
@@ -110,6 +111,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
       function C = ne(A,B), C = ne@hgsetgetex(A,B); end
    end
    methods
+      copyattach(obj,h) % attach a copy of specified object
       getdisp(obj) % overriding hgsetgetex
       setdisp(obj) % overriding hgsetgetex
       
@@ -156,7 +158,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
                % if h is integer array & GraphicsHandle is not given in the
                % property name-value pair arguments, treat it as the HG array.
                % Else, treat it as the size array.
-               nothg = isnumeric(h) && all(h==floor(h)); % potentially not HG
+               nothg = isnumeric(h(:)) && all(h(:)==floor(h(:))); % potentially not HG
                if nothg
                   pargs = hgsetgetex.unifyproppairs(varargin(2:end));
                   if iscellstr(pargs{1})
