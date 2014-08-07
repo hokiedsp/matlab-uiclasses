@@ -113,10 +113,12 @@ function update_enable(obj,val)
    idx = strcmp(val,'inactive') & strcmp(obj.d_hgw_states,'off');
    h(idx) = [];
    lis(idx) = [];
-   lisena = get(lis,{'Enabled'});
-   set(lis,'Enabled','off');
-   set(h,'Enable',val);
-   set(lis,{'Enabled'},lisena);
+   if ~isempty(lis)
+      lisena = {lis.Enabled};
+      [lis.Enabled] = deal(false);
+      set(h,'Enable',val);
+      [lis.Enabled] = deal(lisena{:});
+   end
    
    h = obj.d_hgs;
    lis = obj.d_hg_listeners;
