@@ -1,7 +1,12 @@
 function [col_wlims,row_hlims,Ivis,subs] = format_grid(obj)
 
 % determine object visibility
-Ivis = strcmp(get(obj.elem_h,'Visible'),'on');
+N = numel(obj.elem_h);
+Ivis = false(N,1);
+[hgw,I] = hgwrapper.findobj(obj.elem_h);
+Ivis(I) = strcmp(get(hgw,'Visible'),'on');
+I = setdiff(1:N,I);
+Ivis(I) = strcmp(get(obj.elem_h(I),'Visible'),'on');
 if ~any(Ivis), return; end % if nothing visible, nothing to do
 map = obj.map;
 map(ismember(map,find(~Ivis))) = 0; % ignore hidden element
