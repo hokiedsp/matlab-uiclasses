@@ -108,7 +108,7 @@ classdef hgdisguise < uipanelautoresize
             || (nargin>1 && all(cellfun(@isnumeric,varargin(1:2))));
          if ~nohg % must have at least one input argument
             arg1 = varargin{1};
-            nohg = ~(all(ishghandle(arg1)) && numel(unique(arg1))==numel(arg1) ...
+            nohg = ~(numel(unique(arg1))==numel(arg1) ...
                && (nargin==1||~isnumeric(varargin{2})));
             
             if ~nohg
