@@ -15,6 +15,10 @@ function attach(obj,h,varargin)
 % For all derived classes, call this attach function before adding any
 % other listeners to hg_listener array
 
+if ~isequal(size(obj),size(h))
+   error('OBJ array and H array must be of the same size.');
+end
+
 if ~all(isvalid(obj))
    error('OBJ array contains least one invalid HGWRAPPER object.');
 end
