@@ -60,7 +60,7 @@ try
       subs1 = subs0 + span;
       
       x0 = X0(subs0(2)); % default left aligned
-      y0 = Y0(subs0(1)); % default bottom aligned
+      y0 = Y0(subs0(1)+span(1)); % default bottom aligned
       
       wcol = sum(Wcol(subs0(2):subs1(2)))+obj.inmargin(1)*span(2);
       hrow = sum(Hrow(subs0(1):subs1(1)))+obj.inmargin(2)*span(1);
