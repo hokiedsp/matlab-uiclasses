@@ -12,7 +12,7 @@ if ~added, return; end % already in the system (just in case)
 try
    subs = obj.nextcellsubs(1);
 catch
-   warning('Added children is excluded from the grid as it is already full.');
+   warning('uiflowgridcontainer:GridFull','Added children is excluded from the grid as it is already full.');
    added = false;
    return;
 end
