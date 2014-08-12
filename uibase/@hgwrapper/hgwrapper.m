@@ -217,6 +217,9 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
       [HgGiven,prt,vis,args] = getcritcalhgprops(args,Iend) % get parent and visible properties
    end
    methods (Access=protected)
+
+      [vals,names] = gethgprops(obj,names)
+      a = sethgprop(obj,name,val)
       
       init(obj) % implementing hgsetgetex.init
       validatehg(obj,h) % to be validate that the HG object is supported by the class
