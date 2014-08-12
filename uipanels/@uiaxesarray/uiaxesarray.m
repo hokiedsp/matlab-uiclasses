@@ -33,11 +33,14 @@ classdef uiaxesarray < uiflowgridcontainer
 %
 %      AutoExpand           - [{'on'}|'off'] 'on' to expand grid size as
 %                             needed
+%      ElementSpacings     - [horizontal vertical] spacings between 
+%                            elements in pixels
 %      ExcludedChildren     - list of ignored children objects
 %      GridSize             - [nrows ncols]
 %      GridFillingOrder     - 'rowsfirst'|'columnsfirst'
 %      HorizontalAlignment  - 'left'|'center'|'right'|'distribute'
-%      Margin               - element spacing in pixels (if not distribute)
+%      Margins             - [left bottom right top] outside margins of the
+%                            grid in pixels
 %      VerticalAlignment    - 'bottom'|'middle'|'top'|'distribute'
 %
 %      Elements             - children HG objects in grid
