@@ -25,7 +25,7 @@ narginchk(2,inf)
 N = numel(obj);
 inc_src = ~isscalar(src);
 
-if inc_src && isequal(size(src),size(obj))
+if inc_src && ~isequal(size(src),size(obj))
    error('Size of source object array must match that of OBJ.');
 end
 
