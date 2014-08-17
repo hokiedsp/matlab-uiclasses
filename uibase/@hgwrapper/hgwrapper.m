@@ -102,6 +102,8 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
       
       h = hgbase(obj) % return base HG object
       
+      p = ancestor(obj,varargin)
+      
       % seal superclass functions
       varargout = get(obj,varargin)
       a = set(obj,varargin)
@@ -111,7 +113,7 @@ classdef hgwrapper < hgsetgetex & matlab.mixin.Heterogeneous
       function C = ne(A,B), C = ne@hgsetgetex(A,B); end
    end
    methods
-      copyattach(obj,h) % attach a copy of specified object
+      copyattach(obj,h,varargin) % attach a copy of specified object
       getdisp(obj) % overriding hgsetgetex
       setdisp(obj) % overriding hgsetgetex
       
