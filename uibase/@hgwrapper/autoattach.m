@@ -93,7 +93,7 @@ for n = 1:numel(h)
       parg = {'Parent',prt{n}};
    end
    if ~isempty(vis) && ~isempty(vis{n})
-      varg = {'Visible',vis{1}};
+      varg = {'Visible',vis{n}};
    end
    h(n) = hgobj(parg{:},varg{:});
 end
