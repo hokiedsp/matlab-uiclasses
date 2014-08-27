@@ -26,7 +26,7 @@ end
 % if partial range, adjust current frame so that it is within the range
 frm = obj.getcurrentframe();
 if frm<obj.pbrng(1)
-   obj.setcurrentframe(obj.pbrng(1));
+   obj.updateframe(obj.pbrng(1));
 elseif frm>obj.pbrng(2)
-   obj.setcurrentframe(obj.pbrng(2));
+   obj.updateframe(obj.pbrng(2));
 end
