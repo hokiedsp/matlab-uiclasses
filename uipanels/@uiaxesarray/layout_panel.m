@@ -9,7 +9,7 @@ function layout_panel(obj)
 
 obj.layout_panel@uiflowgridcontainer();
 
-if ~(obj.inclabel && obj.isattached()) || isempty(obj.elem_h); return; end
+if isempty(obj.elem_h) || ~(obj.inclabel && obj.isattached()); return; end
 
 h = obj.elem_h;
 set(h,'Units','pixels'); % just in case
