@@ -43,9 +43,11 @@ if isempty(path)
    path = obj.FolderPath;
 else
    if ispc && ~isempty(regexp(path(1),'[a-zA-Z]','once')) && path(2)==':'
-      path([1 2]) = []; % remove the drive letter
+      pathchk = path(3:end); % remove the drive letter
+   else
+      pathchk = path;
    end
-   if ~isempty(regexp(path, ':[*?"<>|]', 'once'))
+   if ~isempty(regexp(pathchk, ':[*?"<>|]', 'once'))
       error('Contains an invalid character');
    end
 end

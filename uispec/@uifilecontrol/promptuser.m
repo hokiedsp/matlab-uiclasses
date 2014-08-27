@@ -43,8 +43,7 @@ if ~isempty(obj.FileName)
 
 end
 
-obj.FolderPath = newfolderpath;
-obj.FileName = newfilename;
+obj.FilePath = newfile;
 
 % format hg with the new file (& history)
 obj.format_hg();
