@@ -18,18 +18,20 @@ al = obj.autolayout;
 obj.autolayout = false;
 N = numel(obj.vweight);
 if N==0
-   obj.vweight = nan;
+   obj.vweight = 1;
 elseif N~=obj.gridsize(1)
    vweight = obj.vweight;
-   vweight(obj.gridsize(1)+1:end) = [];
+   vweight(N+1:obj.gridsize(1),1) = mean(vweight);
+   vweight(obj.gridsize(1)+1:end,1) = [];
    obj.vweight = vweight;
 end
 N = numel(obj.hweight);
 if N==0
-   obj.hweight = nan;
+   obj.hweight = 1;
 elseif N~=obj.gridsize(2)
    hweight = obj.hweight;
-   hweight(obj.gridsize(2)+1:end) = [];
+   hweight(N+1:obj.gridsize(2),1) = mean(hweight);
+   hweight(obj.gridsize(2)+1:end,1) = [];
    obj.hweight = hweight;
 end
 obj.autolayout = al;
