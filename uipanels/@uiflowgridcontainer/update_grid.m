@@ -17,16 +17,20 @@ end
 al = obj.autolayout;
 obj.autolayout = false;
 N = numel(obj.vweight);
-if N~=obj.gridsize(1)
-   vweight = obj.VerticalWeight;
+if N==0
+   obj.vweight = nan;
+elseif N~=obj.gridsize(1)
+   vweight = obj.vweight;
    vweight(obj.gridsize(1)+1:end) = [];
-   obj.VerticalWeight = vweight;
+   obj.vweight = vweight;
 end
 N = numel(obj.hweight);
-if N~=obj.gridsize(2)
-   hweight = obj.HorizontalWeight;
+if N==0
+   obj.hweight = nan;
+elseif N~=obj.gridsize(2)
+   hweight = obj.hweight;
    hweight(obj.gridsize(2)+1:end) = [];
-   obj.HorizontalWeight = hweight;
+   obj.hweight = hweight;
 end
 obj.autolayout = al;
 
