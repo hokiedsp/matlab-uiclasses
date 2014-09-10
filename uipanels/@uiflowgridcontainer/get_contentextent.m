@@ -23,6 +23,10 @@ end
 
 % determine the grid structure including object visibility
 [col_wlims,row_hlims,Ivis,subs] = obj.format_grid();
+if isempty(col_wlims)
+   val = [0 0 0 0];
+   return;
+end
 
 if full
    ncol = size(col_wlims,1);
