@@ -7,7 +7,7 @@ function init(obj)
 %   call the INIT() of the superclass first.
 
 % run superclass init first
-obj.init@uipanelex();
+obj.init@uipanelautoresize();
 
 obj.propopts.Canvas = struct([]);
 obj.propopts.Window = struct([]);
@@ -57,5 +57,7 @@ obj.propopts.VerticalScrollbarStep = struct(...
    'OtherTypeDesc',{{'[positive scalar]'}},...
    'OtherTypeValidator',{{{'numeric'},{'scalar','positive','finite'}}},...
    'Default',10);
+
+obj.propopts.WindowSize = struct([]);
 
 obj.sortpropopts([],false,false,true,true);

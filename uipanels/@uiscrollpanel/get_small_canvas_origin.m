@@ -5,7 +5,12 @@ function origin = get_small_canvas_origin(csize,ssize,align,other_vis,other_locl
 if align==1
    origin = 1;
 else
-   origin = ssize-csize;
+   origin = ssize-csize; % excess space available
+   
+   if other_vis % if other scrollbar is visible, reduce the excess space by the scrollbar thickness
+      origin = origin - th;
+   end
+   
    if align==2 % align = center/middle
       origin = origin/2;
    end

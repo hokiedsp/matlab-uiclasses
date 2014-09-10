@@ -1,4 +1,4 @@
-classdef uiscrollpanel < uipanelex
+classdef uiscrollpanel < uipanelautoresize
    %UISCROLLPANEL   An HG panel with scrollable canvas
    %   UISCROLLPANEL embeds a panel type HG objects (<a href="matlab:help uicontainer">uicontainer</a> (default), <a href="matlab:help uipanel">uipanel</a>,
    %   <a href="matlab:help uigridcontainer">uigridcontainer</a>, or <a href="matlab:help uiflowcontainer">uiflowcontainer</a>) as a canvas in a panel with
@@ -63,12 +63,10 @@ classdef uiscrollpanel < uipanelex
    %      get              - Get value of UISCROLLPANEL object property.
    %      set              - Set value of UISCROLLPANEL object property.
    
-   properties
-      ResizeFcnMode            % ['auto'|'manual']
-   end
    properties (SetAccess=private,Dependent)
       Window                  % container HG handle (outside base panel)
       Canvas                  % container HG handle (inside object layout area)
+      WindowSize               % size of the visible layout area
    end
    properties (Dependent)
       CanvasOrigin             % location of the LLH corner wrt Shell's LLH corner
@@ -143,8 +141,8 @@ classdef uiscrollpanel < uipanelex
          %   that each object will be updated with a different set of values for the
          %   list of property names contained in pn.
          
-         varargin = uipanelex.autoattach(mfilename,@uicontainer,{'uipanel','uicontainer','uiflowcontainer','uigridcontainer'},varargin);
-         obj = obj@uipanelex(varargin{:});
+         varargin = uipanelautoresize.autoattach(mfilename,@uicontainer,{'uipanel','uicontainer','uiflowcontainer','uigridcontainer'},varargin);
+         obj = obj@uipanelautoresize(varargin{:});
       end
    end
    methods (Access=protected)
@@ -181,6 +179,7 @@ classdef uiscrollpanel < uipanelex
       [issmall,hide] = is_canvas_small(obj,csize,ssize)
       set_canvas_position(obj,pos)
       set_scrollbar(obj,I,val)  % new scrollbar step configuration (Value,Max,ScrollbarSteps)
+      hg_resizefcn(obj)
    end
    
    methods (Access=private,Static)
@@ -260,17 +259,6 @@ classdef uiscrollpanel < uipanelex
             set_canvasunits(obj,val)
          elseif ~isempty(val)
             error('CanvasSize can only be set if OBJ is attached to an HG object.');
-         end
-      end
-      
-      function set.ResizeFcnMode(obj,val)
-         if obj.isattached()
-            [obj.ResizeFcnMode,val] = obj.validateproperty('ResizeFcnMode',val);
-            if val==2 % 'auto' - resize now
-               set(obj.window,'ResizeFcn',@(~,~)obj.layout_panel);
-            end
-         elseif ~isempty(val)
-            error('ResizeFcnMode can only be set if OBJ is attached to an HG object.');
          end
       end
       
@@ -404,6 +392,10 @@ classdef uiscrollpanel < uipanelex
       function set.VerticalScrollbarStep(obj,val)
          obj.validateproperty('VerticalScrollbarStep',val);
          obj.set_scrollbar(2,val);
+      end
+      
+      function val = get.WindowSize(obj)
+         [~,val] = obj.get_canvas_position(true);
       end
    end
    

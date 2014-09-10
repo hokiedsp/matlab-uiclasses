@@ -15,7 +15,7 @@ function val = get_contentextent(obj,h)
 %   encompassing the objects in H.
 
 if nargin==2
-   val = obj.get_contentextent@uipanelex(h);
+   val = obj.get_contentextent@uipanelautoresize(h);
    return;
 end
 
@@ -26,7 +26,7 @@ if isempty(h)
    return;
 end
 
-val = obj.get_contentextent@uipanelex(h);
+val = obj.get_contentextent@uipanelautoresize(h);
 if isempty(val)
    return;
 end

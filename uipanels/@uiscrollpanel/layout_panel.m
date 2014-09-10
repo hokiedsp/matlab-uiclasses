@@ -21,14 +21,6 @@ end
 
 [issmall,hide] = obj.is_canvas_small(pos_canvas([3 4]),sz_shell);
 
-% configure scrollbars
-pn = {'Visible','Enable'};
-pv = cell(2);
-pvals = {'on' 'off'};
-pv(:,1) = pvals(1+hide);
-pv(:,2) = pvals(1+issmall);
-set(obj.hscrollbars,pn,pv);
-
 pos = zeros(1,4);
 [pos(1),pos(2),pos(3),pos(4)] = uiscrollpanel.get_scrollbar_position(obj.loclo(1),...
    sz_shell(1),obj.hscrollbars(2),obj.loclo(2),sz_shell(2),obj.thickness);
@@ -37,6 +29,14 @@ set(obj.hscrollbars(1),'Position',pos);
 [pos(2),pos(1),pos(4),pos(3)] = uiscrollpanel.get_scrollbar_position(obj.loclo(2),...
    sz_shell(2),obj.hscrollbars(1),obj.loclo(1),sz_shell(1),obj.thickness);
 set(obj.hscrollbars(2),'Position',pos);
+
+% configure scrollbars
+pn = {'Visible','Enable'};
+pv = cell(2);
+pvals = {'on' 'off'};
+pv(:,1) = pvals(1+hide);
+pv(:,2) = pvals(1+issmall);
+set(obj.hscrollbars,pn,pv);
 
 % Configure horizontal dimension
 if issmall(1)

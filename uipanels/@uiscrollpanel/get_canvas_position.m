@@ -10,6 +10,10 @@ if nargin<2
    actual = false;
 end
 
+% momentarily clear canvas resizefcn
+canvas_rszfcn = obj.hcanvas.ResizeFcn;
+obj.hcanvas.ResizeFcn = {};
+
 backup = get(obj.hcanvas,{'Units','Position'});
 
 set(obj.hcanvas,'Units','pixels');
@@ -27,3 +31,5 @@ if actual
    dispsize(:) = dispsize - fliplr((obj.onoff&obj.vis)*obj.thickness);
    % v-scroll reduces the width & h-scroll reduces the height
 end
+
+obj.hcanvas.ResizeFcn = canvas_rszfcn;

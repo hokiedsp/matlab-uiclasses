@@ -7,7 +7,7 @@ function populate_panel(obj)
 if ~obj.isattached(), return; end
 
 % create the other container
-hgiswindow = any(strcmp(get(obj.hg,'type'),{'uipanel'}));
+hgiswindow = any(strcmp(get(obj.hg,'type'),{'uipanel','uitab','uicontainer'}));
 pnames = {'Parent','Visible','Units','Position'};
 if hgiswindow % if uipanel specified, use obj.hg as the obj.hwindow container
 
@@ -15,7 +15,12 @@ if hgiswindow % if uipanel specified, use obj.hg as the obj.hwindow container
    hchildren = get(obj.hg,'Children');
    
    % create new canvas panel
-   hnew = handle(uicontainer('Parent',obj.hg,'Units','normalized','Position',[0 0 1 1]));
+   try
+      h = double(obj.hg);
+   catch
+      h = obj.hg;
+   end
+   hnew = handle(uicontainer('Parent',h,'Units','normalized','Position',[0 0 1 1]));
    obj.hwindow = obj.hg;
    obj.hcanvas = hnew;
    
@@ -53,11 +58,6 @@ obj.hscrollbars = [...
              'Callback',@(~,~)obj.move_canvas(false,true))...
    ];
 
-% set ResizeFcn property of obj.hg to redraw canvas when resized
-set(obj.hwindow,'ResizeFcn',@(~,~)obj.layout_panel());
-obj.hg_listener(end+1) = addlistener(obj.hwindow,'ResizeFcn','PostSet',...
-   @(~,event)obj.check_resizefcn(event.NewValue));
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set ChildrenAdded listeners for obj.hg to automatically move added
@@ -79,21 +79,24 @@ for n = 1:numel(pcommon)
    obj.hg_listener(end+1) = addlistener(obj.hg,pcommon{n},'PostSet',@(~,event)set(hnew,pcommon{n},event.NewValue));
 end
 
-% now call uipanelex's to set up Enable monitoring
+% now call uipanelautoresize's to set up Enable monitoring
 % - If hg is the canvas and not window, temporarily swap out obj.hg so that
-%   uipanelex sets up Enable monitoring listeners on the window
+%   uipanelautoresize sets up Enable monitoring listeners on the window
 if ~hgiswindow
    obj.hg = obj.hwindow;
 end
-obj.populate_panel@uipanelex();
+obj.populate_panel@uipanelautoresize();
 if ~hgiswindow
    obj.hg = obj.hcanvas;
 end
 
 if hgiswindow
-   % now redo the last hg_listener element (which were set up by uipanelex)
+   % now redo the last hg_listener element (which were set up by uipanelautoresize)
    % to anticipate content_listeners to be set up for the children of
    % hcanvas
    delete(obj.hg_listener(end));
    obj.hg_listener(end) = addlistener(obj.hcanvas,'ObjectChildRemoved',@(~,event)obj.delete_listeners(event.Child));
 end
+
+% change the default ResizeFcn
+obj.rfmode.DefaultValue = @(~,~)obj.hg_resizefcn();
