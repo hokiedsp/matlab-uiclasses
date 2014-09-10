@@ -51,7 +51,5 @@ obj.el_figclose = addlistener(f,'ObjectBeingDestroyed',@(~,~)clear_targetfigure(
 end
 
 function clear_targetfigure(obj)
-if isvalid(obj)
    obj.TargetFigure = [];
-end
 end

@@ -107,6 +107,9 @@ classdef zoompanctrl < hgsetgetex
 
          obj = obj@hgsetgetex(varargin{:});
       end
+      function delete(obj)
+         delete(obj.el_figclose);
+      end
    end
 
    methods (Access=protected)
