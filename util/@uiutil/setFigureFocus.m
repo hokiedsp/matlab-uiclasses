@@ -1,5 +1,6 @@
 function setFigureFocus(h)
 %UIUTIL/SETFIGUREFOCUS
+%   UIUTIL.SETFIGUREFOCUS(H)
 
 % get the figure containing the handle h
 hFig = ancestor(h,'figure');
@@ -30,5 +31,3 @@ end
 
 % Try to get the ancestor FigureFrame
 jRootPane.getTopLevelAncestor.requestFocus();
-
-end
