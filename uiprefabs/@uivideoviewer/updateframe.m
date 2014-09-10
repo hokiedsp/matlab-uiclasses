@@ -58,7 +58,7 @@ else
 end
 
 % display the frame counter
-f = frm0-obj.txoffset; % display zero based frame index
+f = frm0+obj.txoffset; % display zero based frame index
 s = 0; m = 0; h = 0; 
 if obj.txmode>1 % include seconds
    if obj.txfs>0

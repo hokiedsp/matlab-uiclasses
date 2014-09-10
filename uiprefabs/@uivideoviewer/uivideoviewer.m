@@ -86,6 +86,7 @@ classdef uivideoviewer < uipanelex
       % Frame Counter Text Property
       CounterLocation % [none|north|south|east|west|northeast|northwest|{southeast}|southwest]
       CounterFormat % '%f' (%f-placeholder for frame #, %s-second, %m-minutes, %h-hours)
+      CounterFrameIndexOffset % default: 1 (one-based indexing)
       CounterFrameRate % ['video'|positive scalar]
       CounterColor
       CounterFontName
@@ -414,6 +415,14 @@ classdef uivideoviewer < uipanelex
          end
       end
       %--------------------------------------------------------------------
+      function val = get.CounterFrameIndexOffset(obj)
+         val = obj.txoffset+1;
+      end
+      function set.CounterFrameIndexOffset(obj,val)
+         obj.validateproperty('CounterFrameIndexOffset',val);
+         obj.txoffset = val-1;
+      end
+      
       function val = get.CounterColor(obj)
          val = get(obj.tx,'Color');
       end
