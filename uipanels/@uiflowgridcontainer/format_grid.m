@@ -65,7 +65,7 @@ i1 = find(elem_span>1,1,'first');
 if isempty(i1), i1 = Nel+1; end
 for n = 1:i1-1 % for each element without spanning
    
-   loc = find(any(map==n,1));
+   loc = find(any(map==I(n),1)); % return the column index of the cell
    dmin(loc) = max(dmin(loc),elem_lims(n,1));
    %dmax(loc) = min(dmax(loc),elem_lims(n,2));
    dmax(loc) = max(dmax(loc),elem_lims(n,2));
@@ -75,7 +75,7 @@ for n = i1:Nel % for each element with cell spanning
    % reduce the element limits by the total margin size between cells
    elem_lims(n,:) = elem_lims(n,:) - margin*(elem_span(n)-1);
    
-   loc = find(any(map==n,1));
+   loc = find(any(map==I(n),1));
    dmin_n = dmin(loc); % current minimum size for the spanned columns/rows
    dspan_min = sum(dmin_n); % total minimum size spanned over the columns/rows
    if elem_lims(n,1) > dspan_min % takes more length than current minimum
