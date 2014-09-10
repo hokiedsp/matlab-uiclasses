@@ -4,7 +4,16 @@ function validategridsize(obj,val)
 
 validateattributes(val,{'numeric'},{'numel',2,'positive','integer'});
 
-if ~isempty(obj.elem_h)
+% if no elements, any grid size is fine
+if isempty(obj.elem_h), return; end
+
+% if elements won't reflow when gridsize is changed, new gridsize must
+% contain all the elements
+if obj.reflow
+   if ~obj.autoexpand && prod(val) < obj.NumberOfElements
+      error('New GridSize must have more grids than the number of existing elements.');
+   end
+else
    val = val(:).';
    minsize = max(obj.elem_subs + obj.elem_span - 1);
    if any(val<minsize)
