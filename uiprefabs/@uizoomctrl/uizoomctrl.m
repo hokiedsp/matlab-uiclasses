@@ -1,4 +1,4 @@
-classdef uizoomctrl < uipanelautoresize
+classdef uizoomctrl < uipanelautoresize & zoompanctrl
    %UIZOOMCTRL   UIPANEL with buttons to turn zoom/pan on/off on a figure
    %   UIZOOMCTRL provides a user interface with 4 buttons, which act
    %   identically to those in the default figure toolbar: pointer (normal),
@@ -71,68 +71,60 @@ classdef uizoomctrl < uipanelautoresize
    events
       ModeChanged
    end
+
+   properties
+      DefaultMode          % 'point'|'zoomin'|'zoomout'|'pan'
+
+      PanEnable            %{'on'}|'inactive'|'off'
+      PanVisible           %{'on'}|'off'
+      PointerEnable          %{'on'}|'inactive'|'off'
+      PointerVisible         %{'on'}|'off'
+      ZoomInEnable         %{'on'}|'inactive'|'off'
+      ZoomInVisible        %{'on'}|'off'
+      ZoomOutEnable        %{'on'}|'inactive'
+      ZoomOutVisible       %{'on'}|'off'
+   end
    properties (Dependent=true,SetAccess=private)
       UIReady
    end
    properties (Dependent=true)
       AllowUnselect        %'on'|{'off'} - Allows CurrentMode = []
       ButtonSize           %positive val
-      CurrentMode          %{'point'}|'zoomin'|'zoomout'|'pan'
-      PanVisible           %{'on'}|'inactive'|'disable'|'off'
-      PanXBounded          %{'on'}|'off' limit panning on x-axis to the zoomed out point
-      PanYBounded          %{'on'}|'off' limit panning on y-axis to the zoomed out point
-      PointTooltipString   %string
-      PointVisible         %{'on'}|'inactive'|'disable'|'off'
-      TargetFigure         %figure handle
-      ZoomInVisible        %{'on'}|'inactive'|'disable'|'off'
-      ZoomOutVisible       %{'on'}|'inactive'|'disable'|'off'
-      
-      ZoomButtonDownFilter %<function_handle>
-      ZoomEnable           %'on'|{'off'}
-      ZoomMotion           %'horizontal'|'vertical'|{'both'}
-      ZoomRightClickAction %'InverseZoom'|{'PostContextMenu'}
-      ZoomUIContextMenu    %<handle>
-      
-      PanButtonDownFilter  %<function_handle>
-      PanEnable            %'on'|{'off'}
-      PanMotion            %'horizontal'|'vertical'|{'both'}
-      PanUIContextMenu     %<handle>
+      PointerTooltipString   %string
+
+      % CurrentMode          %{'point'}|'zoomin'|'zoomout'|'pan'
+      % PanVisible           %{'on'}|'inactive'|'disable'|'off'
+      % PanXBounded          %{'on'}|'off' limit panning on x-axis to the zoomed out point
+      % PanYBounded          %{'on'}|'off' limit panning on y-axis to the zoomed out point
+      % PointVisible         %{'on'}|'inactive'|'disable'|'off'
+      % TargetFigure         %figure handle
+      % ZoomInVisible        %{'on'}|'inactive'|'disable'|'off'
+      % ZoomOutVisible       %{'on'}|'inactive'|'disable'|'off'
+      % 
+      % ZoomButtonDownFilter %<function_handle>
+      % ZoomMotion           %'horizontal'|'vertical'|{'both'}
+      % ZoomRightClickAction %'InverseZoom'|{'PostContextMenu'}
+      % ZoomUIContextMenu    %<handle>
+      % 
+      % PanButtonDownFilter  %<function_handle>
+      % PanMotion            %'horizontal'|'vertical'|{'both'}
+      % PanUIContextMenu     %<handle>
    end
    properties (Access=private)
-      
-      fig      % figure under control
       btns     % uicontrol toggle buttons
       jbtns    % btns' java handles
-      zoom     % figure's zoom object
-      pan      % figure's pan object
-      
-      mode      % current operating mode
-      unsel     % true if mode can be unspecified
-      panelsize % button size is fixed to this value
-      
-      ax      % fig's axes list
-      axlims  % zoomed out limits; each row: [xmin xmax ymin ymax]
-      
-      panxbound
-      panybound
-      
-      el_figclose % listen to obj.fig window closure
-      el_axpos    % listens to following axes position
+      panelsize
+      el_btnstates % listens to changes in btns' Visible/Enable PostSet
+      btnstates % true if button is available
+      unsel    % true if mode can be unspecified
+      el_axpos
    end
    
    methods
       
       javainit(obj) % if uizoomctrl is constructed with 'Visible'='off', call javainit when uizoomctrl became visible 
-      
-      reset(obj)
-      zoomin(obj,axes,factor)
-      zoomout(obj,axes,factor)
-      V = getAxesZoomOutPoint(obj,axes)
+      followAxes(obj,ax,loc,offset) % to make uizoomctrl panel to follow an axes
 
-      scanAxes(obj) % scan for the axes on the figure
-      
-      followAxes(obj,ax,loc) % automatic object positioning wrt an Axes
-      
       function obj = uizoomctrl(varargin)
          %   OBJ = UIZOOMCTRL() creates a uipanel with zoom/pan control
          %   buttons on the current figure. Its mode controls the axes in
@@ -146,6 +138,7 @@ classdef uizoomctrl < uipanelautoresize
          %   UIPANEL.
 
          obj = obj@uipanelautoresize(varargin{:});
+         obj = obj@zoompanctrl();
       end
    end
    methods (Access=protected)
@@ -154,19 +147,28 @@ classdef uizoomctrl < uipanelautoresize
       unpopulate_panel(obj)
       layout_panel(obj) % layout the buttons according to the ButtonSize & XXXVisible properties
       mode = enable_action(obj)
-   end
-   methods (Access=private)
-      val = get_btnvisible(obj,type)
-      set_targetfigure(obj,h)
 
-      setpanelsize(obj)
-      modechange(obj,newmode) % used by set.CurrentMode & Buttons' Callbacks
+      f = set_targetfigure(obj,h)
+      cfg_currentmode(obj,newmode)
+      cfg_supportedmodes(obj)
+      
+      val = get_btnena(obj,type)
+      set_btnena(obj,type,val,btnname)
+      
       btnscallback(obj,h) % Buttons' callback function
+
+      val = get_btnvis(obj,type)
+      set_btnvis(obj,type,val,btnname)
+      
+      monitor_btnsstate(obj,type,newstate,otherisena)
+
       btnsvisiblechange(obj,idx,mode) % performs changes in XXXVisible properties
-      panactionpostfcn(obj,h,evt)
    end
    
    methods  % TO GET & SET DEPENDENT PROPERTIES
+      function set.DefaultMode(obj,val)
+         obj.DefaultMode = obj.validateproperty('DefaultMode',val);
+      end
       
       function val = get.AllowUnselect(obj)
          val = obj.propopts.AllowUnselect.StringOptions{2-obj.unsel};
@@ -187,62 +189,14 @@ classdef uizoomctrl < uipanelautoresize
          end
       end
       
-      function val = get.CurrentMode(obj)
-         val = obj.propopts.CurrentMode.StringOptions{obj.mode};
-      end
-      function set.CurrentMode(obj,val)
-         %'none'|{'point'}|'zoomin'|'zoomout'|'pan'
-         [~,val] = obj.validateproperty('CurrentMode',val);
-         if val==1 && ~obj.unsel
-            error('CurrentMode cannot be empty if AllowUnselect = ''off''.');
-         end
-         obj.modechange(val-1);
-      end
-      
-      function val = get.TargetFigure(obj)
-         val = obj.fig;
-      end
-      function set.TargetFigure(obj,val)
-         obj.validateproperty('TargetFigure',val);
-         obj.set_targetfigure(val);
-      end
-      
-      function val = get.PointVisible(obj)
-         val = obj.get_btnvisible(1);
-      end
-      function set.PointVisible(obj,val)
-         obj.set_btnvisible(1,val);
-      end
-      
-      function val = get.ZoomInVisible(obj)
-         val = obj.get_btnvisible(2);
-      end
-      function set.ZoomInVisible(obj,val)
-         obj.set_btnvisible(2,val);
-      end
-      
-      function val = get.ZoomOutVisible(obj)
-         val = obj.get_btnvisible(3);
-      end
-      function set.ZoomOutVisible(obj,val)
-         obj.set_btnvisible(3,val);
-      end
-      
-      function val = get.PanVisible(obj)
-         val = obj.get_btnvisible(4);
-      end
-      function set.PanVisible(obj,val)
-         obj.set_btnvisible(4,val);
-      end
-      
-      function val = get.PointTooltipString(obj)
+      function val = get.PointerTooltipString(obj)
          if isempty(obj.jbtns)
             val = '';
          else
-            val = char(obj.jbtns(1).getToolTipText());
+            val = char(obj.jbtns.pointer.getToolTipText());
          end
       end
-      function set.PointTooltipString(obj,val)
+      function set.PointerTooltipString(obj,val)
          if ~obj.isattached()
             error('PointTooltipString can be set only if attached.');
          end
@@ -257,161 +211,6 @@ classdef uizoomctrl < uipanelautoresize
          end
       end
       
-      function val = get.PanXBounded(obj)
-         val = obj.propopts.PanXBounded.StringOptions{2-obj.panxbound};
-      end
-      function set.PanXBounded(obj,val) 
-         [~,val] = obj.validateproperty('PanXBounded',val);
-         obj.panxbound = strcmp(val,'on');
-      end
-      
-      function val = get.PanYBounded(obj)
-         val = obj.propopts.PanYBounded.StringOptions{2-obj.panybound};
-      end
-      function set.PanYBounded(obj,val) 
-         [~,val] = obj.validateproperty('PanYBounded',val);
-         obj.panybound = strcmp(val,'on');
-      end
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      %%% ZOOM object property wrappers
-
-      function val = get.ZoomButtonDownFilter(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.zoom.ButtonDownFilter;
-         end
-      end
-      function set.ZoomButtonDownFilter(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.zoom.ButtonDownFilter = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
-      function val = get.ZoomMotion(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.zoom.Motion;
-         end
-      end
-      function set.ZoomMotion(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.zoom.Motion = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
-      function val = get.ZoomRightClickAction(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.zoom.RightClickAction;
-         end
-      end
-      function set.ZoomRightClickAction(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.zoom.RightClickAction = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
-      function val = get.ZoomUIContextMenu(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.zoom.UIContextMenu;
-         end
-      end
-      function set.ZoomUIContextMenu(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.zoom.UIContextMenu = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-       
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      %%% PAN object property wrappers
-
-      function val = get.PanButtonDownFilter(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.pan.ButtonDownFilter;
-         end
-      end
-      function set.PanButtonDownFilter(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.pan.ButtonDownFilter = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
-      function val = get.PanMotion(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.pan.Motion;
-         end
-      end
-      function set.PanMotion(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.pan.Motion = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
-      function val = get.PanUIContextMenu(obj)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            val = {};
-         else
-            val = obj.pan.UIContextMenu;
-         end
-      end
-      function set.PanUIContextMenu(obj,val)
-         if isempty(obj.fig) || ~ishghandle(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.pan.UIContextMenu = val;
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
       function val = get.UIReady(obj)
          if isempty(obj.btns)
             val = 'off';
@@ -419,105 +218,47 @@ classdef uizoomctrl < uipanelautoresize
             val = 'on';
          end
       end
+      
+      function set.PointerVisible(obj,val)
+         obj.PointVisible = obj.validateproperty('PointerVisible',val);
+         obj.set_btnvis(1,val,'pointer');
+      end
+      
+      function set.ZoomInVisible(obj,val)
+         obj.ZoomInVisible = obj.validateproperty('ZoomInVisible',val);
+         obj.set_btnvis(2,val,'zoomin');
+      end
+      
+      function set.ZoomOutVisible(obj,val)
+         obj.ZoomOutVisible = obj.validateproperty('ZoomOutVisible',val);
+         obj.set_btnvis(3,val,'zoomout');
+      end
+      
+      function set.PanVisible(obj,val)
+         obj.PanVisible = obj.validateproperty('PanVisible',val);
+         obj.set_btnvis(4,val,'pan');
+      end
+      
+      function set.PointerEnable(obj,val)
+         obj.PointEnable = obj.validateproperty('PointerEnable',val);
+         obj.set_btnena(1,val,'pointer');
+      end
+      
+      function set.ZoomInEnable(obj,val)
+         obj.ZoomInEnable = obj.validateproperty('ZoomOutEnable',val);
+         obj.set_btnena(2,val,'zoomin');
+      end
+      
+      function set.ZoomOutEnable(obj,val)
+         obj.ZoomOutEnable = obj.validateproperty('ZoomOutEnable',val);
+         obj.set_btnena(3,val,'zoomout');
+      end
+      
+      function set.PanEnable(obj,val)
+         obj.PanEnable = obj.validateproperty('PanEnable',val);
+         obj.set_btnena(4,val,'pan');
+      end
+      
    end
    
-   
-   methods % passing through the ZOOM & PAN object functions
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      % ZOOM object function wrappers
-      
-      function flag = isAllowAxesZoom(obj,ax)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               flag = obj.zoom.isAllowAxesZoom(ax);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      function setAllowAxesZoom(obj,ax,flag)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.zoom.setAllowAxesZoom(ax,flag);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      function style = getAxesZoomMotion(obj,ax)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               style = obj.zoom.getAxesZoomMotion(ax);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      function setAxesZoomMotion(obj,ax,style)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.zoom.setAxesZoomMotion(ax,style);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      % PAN object function wrappers
-      function flag = isAllowAxesPan(obj,ax)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               flag = obj.pan.isAllowAxesPan(ax);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      function setAllowAxesPan(obj,ax,flag)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.pan.setAllowAxesPan(ax,flag);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      function style = getAxesPanMotion(obj,ax)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               style = obj.pan.getAxesPanMotion(ax);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-      function setAxesPanMotion(obj,ax,style)
-         if isempty(obj.fig)
-            error('OBJ.TargetFigure is not set or invalid.');
-         else
-            try
-               obj.pan.setAxesPanMotion(ax,style);
-            catch ME
-               ME.throwAsCaller();
-            end
-         end
-      end
-   end
-
 end

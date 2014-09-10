@@ -12,5 +12,13 @@ function mode = enable_action(obj)
 
 mode = obj.enable_action@uipanelex();
 
+ok = mode==0;
+
 % set Enable properties of buttons
-set(obj.jbtns,'Enable',mode==0);
+try
+   obj.jbtns.pointer.setEnabled(ok && obj.btnstates.pointer);
+   obj.jbtns.zoomin.setEnabled(ok && obj.btnstates.zoomin);
+   obj.jbtns.zoomout.setEnabled(ok && obj.btnstates.zoomout);
+   obj.jbtns.pan.setEnabled(ok && obj.btnstates.pan);
+catch
+end

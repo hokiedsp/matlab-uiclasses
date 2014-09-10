@@ -4,15 +4,16 @@ function layout_panel(obj)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if ~obj.isattached(), return; end
+if ~obj.isattached() || ~obj.autolayout, return; end
 
-if isempty(obj.btns)   % one-time initialization
+if isempty(obj.btns.pointer)   % one-time initialization
    obj.javainit(); % calls layoutui again within if success
-   if isempty(obj.btns), return; end % exit if buttons are not yet constructed
+   if isempty(obj.btns.pointer), return; end % exit if buttons are not yet constructed
 end
 
 % Check visible condition of the buttons
-vis = strcmp(get(obj.btns,'Visible'),'on');
+h = struct2array(obj.btns);
+vis = strcmp(get(h,'Visible'),'on');
 
 % compute the horizontal button positions and the minimum width of the uipanel
 Nbtns = sum(vis);
@@ -26,7 +27,10 @@ else
 end
 
 % set buttons
-set(obj.btns(vis),{'Position'},pos);
+set(h(vis),{'Position'},pos);
 
 % fix panel size
+al = obj.autolayout;
+obj.autolayout = false;
 obj.setpanelsize();
+obj.autolayout = al;

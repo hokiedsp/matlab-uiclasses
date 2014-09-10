@@ -15,6 +15,4 @@ set(obj.hg,'Position',pos);
 obj.javainit(); % buttons only drawn if the panel is visible
 
 % if target figure not set, 
-if isempty(obj.TargetFigure)
-   obj.set_targetfigure(obj.hg);
-end
+obj.TargetFigure = ancestor(obj.hg,'figure');

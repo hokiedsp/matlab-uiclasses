@@ -1,0 +1,36 @@
+function init(obj)
+%ZOOMPANCTRL/PROPOPTS   Returns set/get property attribute cell
+
+obj.el_figclose = handle([]);
+
+obj.propopts.CurrentMode = struct(...
+   'StringOptions',{{'none' 'zoomin' 'zoomout' 'pan'}},...
+   'Default','none');
+obj.propopts.SupportedModes = struct(...
+   'StringOptions',{{'zoomin' 'zoomout' 'pan'}},...
+   'MultiSelect',true,...
+   'Default',{{'zoomin' 'zoomout' 'pan'}});
+obj.propopts.TargetFigure = struct(...
+   'EmptyAllowed',true,...
+   'OtherTypeValidator',@(val)obj.isfig(val));
+
+obj.propopts.PanXBounded = struct(...
+   'StringOptions',{{'on' 'off'}},...
+   'Default','on');
+obj.propopts.PanYBounded = struct(...
+   'StringOptions',{{'on' 'off'}},...
+   'Default','on');
+
+obj.propopts.ZoomButtonDownFilter = struct([]);
+obj.propopts.ZoomMotion = struct([]);
+obj.propopts.ZoomRightClickAction = struct([]);
+obj.propopts.ZoomUIContextMenu = struct([]);
+% obj.propopts.PreZoomCallback = struct([]);
+% obj.propopts.PostZoomCallback = struct([]);
+obj.propopts.PanButtonDownFilter = struct([]);
+obj.propopts.PanMotion = struct([]);
+obj.propopts.PanUIContextMenu = struct([]);
+% obj.propopts.PrePanCallback = struct([]);
+% obj.propopts.PostPanCallback = struct([]);
+
+obj.sortpropopts([],false,false,true,true);

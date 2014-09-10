@@ -1,27 +1,19 @@
-function btnscallback(obj,idx)
+function btnscallback(obj,name)
 %UIZOOMCTRL/BTNSCALLBACK   Callback function executed when clicked on a button
 % both obj & idx are assumed to be scalar
 
-state = get(obj.jbtns(idx),'Selected');
-
-if state % depressed
-   newmode = idx;
-else % released
+if ~obj.jbtns.(name).isSelected() % released
    if obj.unsel % unselect allowed
-      newmode = 0;
-   else % cannot be unselected
-      newmode = obj.mode;
-      %set(h,'Value',~state); % depress
-      obj.jbtns(newmode).setSelected(~state);
+      name = 'none';
+   else % cannot be unselected, pick another
+      name = obj.DefaultMode;
+      obj.jbtns.(name).setSelected(true);
    end
 end
 
-changed = obj.mode~=newmode;
-
-% update the mode accordingly
-obj.modechange(newmode);
-
 % call user callback if mode is changed & callback is defined
+changed = ~strcmp(obj.CurrentMode,name);
 if changed
+   obj.CurrentMode = name;
    notify(obj,'ModeChanged');
 end

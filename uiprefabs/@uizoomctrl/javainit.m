@@ -6,7 +6,7 @@ function javainit(obj)
 
 % format panel
 
-if ~isempty(obj.btns), return; end % already initialized
+if ~isempty(obj.btns.pointer), return; end % already initialized
 
 % for these buttons to be visible, all its ancestors must be visible
 if ~uiutil.isvisible(obj.hg), return; end
@@ -15,8 +15,8 @@ sz = obj.panelsize(2)-2; % button size
 commonprops = {};
 
 % create buttons
-[j,h] = javacomponent('javax.swing.JToggleButton',[1 1 sz sz],obj.hg);
-if isempty(h) % uizoomctrl is not visible, javainit must run after the ctrl is made visible
+[j,obj.btns.pointer] = javacomponent('javax.swing.JToggleButton',[1 1 sz sz],obj.hg);
+if isempty(j) % uizoomctrl is not visible, javainit must run after the ctrl is made visible
    delete(j);
    return
 end
@@ -25,44 +25,46 @@ if ~isempty(commonprops)
 end
 j.setToolTipText('Normal');
 j.setIcon(scaledimageicon(sz,'tool_pointer.png'));
-set(j,'ActionPerformedCallback',@(~,~)obj.btnscallback(1));
-obj.jbtns = j;
-obj.btns = h;
+obj.jbtns.pointer = j;
+set(obj.jbtns.pointer,'ActionPerformedCallback',@(~,~)obj.btnscallback('pointer'));
+obj.el_btnstates(1,1) = addlistener(obj.btns.pointer,'Visible','PostSet',@(~,d)obj.monitor_btnsstate('pointer',strcmp(d.NewValue,'on'),true));
+set(obj.jbtns.pointer,'PropertyChangeCallback',@(~,evt)propertychangefcn(obj,'pointer',evt));
 
-[j,h] = javacomponent('javax.swing.JToggleButton',[sz 1 sz sz],obj.hg);
+[j,obj.btns.zoomin] = javacomponent('javax.swing.JToggleButton',[sz 1 sz sz],obj.hg);
 if ~isempty(commonprops)
    set(h,commonprops{:});
 end
 j.setToolTipText('Zoom In');
 j.setIcon(scaledimageicon(sz,'tool_zoom_in.png'));
-set(j,'ActionPerformedCallback',@(~,~)obj.btnscallback(2));
-obj.jbtns(2) = j;
-obj.btns(2) = h;
+obj.jbtns.zoomin = j;
+set(obj.jbtns.zoomin,'ActionPerformedCallback',@(~,~)obj.btnscallback('zoomin'));
+obj.el_btnstates(2,1) = addlistener(obj.btns.zoomin,'Visible','PostSet',@(~,d)obj.monitor_btnsstate('zoomin',strcmp(d.NewValue,'on'),true));
+set(obj.jbtns.zoomin,'PropertyChangeCallback',@(~,evt)propertychangefcn(obj,'zoomin',evt));
 
-[j,h] = javacomponent('javax.swing.JToggleButton',[2*sz 1 sz sz],obj.hg);
+[j,obj.btns.zoomout] = javacomponent('javax.swing.JToggleButton',[2*sz 1 sz sz],obj.hg);
 if ~isempty(commonprops)
    set(h,commonprops{:});
 end
 j.setToolTipText('Zoom Out');
 j.setIcon(scaledimageicon(sz,'tool_zoom_out.png'));
-set(j,'ActionPerformedCallback',@(~,~)obj.btnscallback(3));
-obj.jbtns(3) = j;
-obj.btns(3) = h;
+obj.jbtns.zoomout = j;
+set(obj.jbtns.zoomout,'ActionPerformedCallback',@(~,~)obj.btnscallback('zoomout'));
+obj.el_btnstates(3,1) = addlistener(obj.btns.zoomout,'Visible','PostSet',@(~,d)obj.monitor_btnsstate('zoomout',strcmp(d.NewValue,'on'),true));
+set(obj.jbtns.zoomout,'PropertyChangeCallback',@(~,evt)propertychangefcn(obj,'zoomout',evt));
 
-[j,h] = javacomponent('javax.swing.JToggleButton',[3*sz 1 sz sz],obj.hg);
+[j,obj.btns.pan] = javacomponent('javax.swing.JToggleButton',[3*sz 1 sz sz],obj.hg);
 if ~isempty(commonprops)
    set(h,commonprops{:});
 end
 j.setToolTipText('Pan');
 j.setIcon(scaledimageicon(sz,'tool_hand.png'));
-set(j,'ActionPerformedCallback',@(~,~)obj.btnscallback(4));
-obj.jbtns(4) = j;
-obj.btns(4) = h;
+obj.jbtns.pan = j;
+set(obj.jbtns.pan,'ActionPerformedCallback',@(~,~)obj.btnscallback('pan'));
+obj.el_btnstates(4,1) = addlistener(obj.btns.pan,'Visible','PostSet',@(~,d)obj.monitor_btnsstate('pan',strcmp(d.NewValue,'on'),true));
+set(obj.jbtns.pan,'PropertyChangeCallback',@(~,evt)propertychangefcn(obj,'pan',evt));
 
 % select the current mode
-if obj.mode>0
-   obj.jbtns(obj.mode).setSelected(true);
-end
+obj.CurrentMode = obj.CurrentMode;
 
 end
 
@@ -86,4 +88,13 @@ else % scale
    im = javax.swing.ImageIcon(im.getImage().getScaledInstance(sz,sz,java.awt.Image.SCALE_FAST));
 end
 
+end
+
+function propertychangefcn(obj,name,evt)
+% instead of PostSet event listening, use PropertyChangeCallback to monitor
+% the Enabled state of Java JButton
+
+   if strcmp(char(evt.getPropertyName()),'enabled')
+      obj.monitor_btnsstate(name,logical(evt.getNewValue()),'Visible');
+   end
 end
