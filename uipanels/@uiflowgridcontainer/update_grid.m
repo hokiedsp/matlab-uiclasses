@@ -14,8 +14,6 @@ if ~isempty(obj.elem_h)
 end
 
 % Check & update weight vectors
-al = obj.autolayout;
-obj.autolayout = false;
 N = numel(obj.vweight);
 if N==0
    obj.vweight = 1;
@@ -34,7 +32,6 @@ elseif N~=obj.gridsize(2)
    hweight(obj.gridsize(2)+1:end,1) = [];
    obj.hweight = hweight;
 end
-obj.autolayout = al;
 
 % Recreate the grid map
 for n = 1:numel(obj.elem_h)
@@ -46,5 +43,13 @@ for n = 1:numel(obj.elem_h)
    obj.map(I,J) = n;
 end
 
-% done, now compute the limits of grid columns and rows
-obj.layout_panel();
+% force to re-layout the grid
+al = obj.autolayout;
+obj.autolayout = true;
+try
+   obj.layout_panel();
+   obj.autolayout = al;
+catch ME
+   obj.autolayout = al;
+   ME.rethrow();
+end
