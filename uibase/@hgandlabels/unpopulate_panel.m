@@ -8,7 +8,7 @@ function unpopulate_panel(obj)
 %   OBJ.hg, including deleting child objects and listeners and callbacks.
 
 % delete all existing chidren from the panel
-if obj.removepanel
+if obj.removepanel && strcmp(obj.hg.BeingDeleted,'off')
    obj.removeLabel(obj.labels_h);
    delete(obj.haxes);
    obj.haxes = deal([]);
