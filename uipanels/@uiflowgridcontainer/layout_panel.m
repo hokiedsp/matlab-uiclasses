@@ -24,6 +24,10 @@ mout(4) = mout(4) + sum(bmargin([3 4]));
 
 % determine the grid structure including object visibility
 [col_wlims,row_hlims,Ivis,subs] = obj.format_grid();
+if isempty(col_wlims)
+   % no cell is visible
+   return;
+end
 
 try
    % compute the column widths and row heights
