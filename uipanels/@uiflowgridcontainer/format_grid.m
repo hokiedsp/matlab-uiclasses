@@ -7,7 +7,13 @@ Ivis = false(N,1);
 Ivis(I) = strcmp(get(hgw,'Visible'),'on');
 I = setdiff(1:N,I);
 Ivis(I) = strcmp(get(obj.elem_h(I),'Visible'),'on');
-if ~any(Ivis), return; end % if nothing visible, nothing to do
+if ~any(Ivis)
+   Ivis = [];
+   col_wlims = [];
+   row_hlims = [];
+   subs = [];
+   return;
+end % if nothing visible, nothing to do
 map = obj.map;
 map(ismember(map,find(~Ivis))) = 0; % ignore hidden element
 
