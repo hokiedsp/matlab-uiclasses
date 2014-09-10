@@ -78,6 +78,7 @@ classdef uiflowgridcontainer < uipanelautoresize
    end
    properties (Dependent)
       AutoExpand          % [{'on'}|'off'] Auto-expand grid mode
+      ElementsFlowing     % ['on'|{'off'}] 'on' to reflow elements when GridSize is changed
       GridSize            % [nrows ncols]
       GridFillingOrder    % 'horizontalfirst'|'verticalfirst'
       ElementSpacings     % [horizontal vertical] spacing between cells in pixels (if not distribute)
@@ -97,6 +98,7 @@ classdef uiflowgridcontainer < uipanelautoresize
    end
    properties (Access=protected)
       autoexpand % tf
+      reflow     % true to reflow elements when gridsize is changed
       gridsize   % [nrows ncols]
       rowfirst   % true to fill rows first
       inmargin   % spacing between elements [horizontal vertical]
@@ -205,6 +207,8 @@ classdef uiflowgridcontainer < uipanelautoresize
 
       val = get_contentextent(obj,h) % Returns size of panel content
       validategridsize(obj,val)
+      
+      reflow_grid(obj,new_gridsize) % reflow grid according to the new gridsize
    end
    
    methods % public property set/get methods
@@ -219,7 +223,12 @@ classdef uiflowgridcontainer < uipanelautoresize
       end
       function set.GridSize(obj,val)
          obj.validateproperty('GridSize',val);
-         obj.gridsize = val;
+         
+         if obj.reflow && ~isequal(obj.gridsize,val)
+            obj.reflow_grid(val);
+         else
+            obj.gridsize = val;
+         end
          obj.update_grid(); % <- need to be reshape_grid
       end
       
@@ -472,5 +481,15 @@ classdef uiflowgridcontainer < uipanelautoresize
             obj.layout_panel(); % just layout
          end
       end
+      
+      % ElementsFlowing
+      function val = get.ElementsFlowing(obj)
+         val = obj.propopts.ElementsFlowing.StringOptions{2-obj.reflow};
+      end
+      function set.ElementsFlowing(obj,val)
+         [~,val] = obj.validateproperty('ElementsFlowing',val);
+         obj.reflow = val==1;
+      end
+      
    end
 end
