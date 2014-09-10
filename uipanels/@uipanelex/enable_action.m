@@ -98,6 +98,10 @@ for n = 1:numel(h)
                ME.rethrow();
             end
          end
+      elseif strcmp(ME.identifier,'MATLAB:hg:propswch:FindObjFailed')
+         % likely due to trying to set Enable with no 'inactive' support to
+         % 'inactive', just disable and move on
+         set(h(n),'Enable','off');
       else
          ME.rethrow();
       end
