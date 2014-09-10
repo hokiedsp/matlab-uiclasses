@@ -65,6 +65,14 @@ if ~inc_src
    p = repmat(p,size(obj));
 end
 h = copyobj(src,p);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% BUG IN R2014A
+pnew = get(h,{'Parent'});
+[~,I] = ismember([pnew{:}],p);
+h(I) = h;
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
 try
    obj.attach(h,varargin{:});
 catch ME
