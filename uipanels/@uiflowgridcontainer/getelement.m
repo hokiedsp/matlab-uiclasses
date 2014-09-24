@@ -9,6 +9,8 @@ function pv = getElement(obj,h,pn)
 % WidthLimits  % width limits in pixels, each row: [min max]
 % HorizontalAlignment % 'left'|'center'|'right'|'fill'
 % VerticalAlignment   % 'bottom'|'middle'|'top'|'fill'
+% WidthFixed  % 'on'|'off'
+% HeightFixed % 'on'|'off'
 
 narginchk(3,3);
 if ~isscalar(obj)
@@ -38,7 +40,7 @@ if pnischar
    pn = cellstr(pn);
 end
 
-propnames = {'location','heightlimits','widthlimits','span','horizontalalignment','verticalalignment'};
+propnames = {'location','heightlimits','widthlimits','span','horizontalalignment','verticalalignment','widthfixed','heightfixed'};
 pn = cellfun(@(n)validatestring(n,propnames),pn,'UniformOutput',false);
 pv = cell(size(pn));
 
@@ -56,6 +58,12 @@ for n = 1:numel(pn)
          pv{n} = obj.elem_halign_opts(obj.elem_halign(I,:));
       case 'verticalalignment'
          pv{n} = obj.elem_valign_opts(obj.elem_valign(I,:));
+      case 'widthfixed'
+         vals = {'off','on'};
+         pv{n} = vals(obj.elem_hfixed(I));
+      case 'heightfixed'
+         vals = {'off','on'};
+         pv{n} = vals(obj.elem_vfixed(I));
    end
 end
 

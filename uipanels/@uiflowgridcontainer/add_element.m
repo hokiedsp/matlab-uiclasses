@@ -46,6 +46,10 @@ obj.elem_hlims(Inew,:) = hlims;
 obj.elem_halign(Inew,1) = 1; % 'left'
 obj.elem_valign(Inew,1) = 2; % 'middle'
 
+% set hfixed & vfixed to default
+obj.elem_hfixed(Inew,1) = false; % 'dynamic'
+obj.elem_vfixed(Inew,1) = false; % 'dynamic'
+
 % add listener to remove the element automatically from the grid
 % structure when it is destroyed
 obj.content_listeners(end+1) = addlistener(h,'ObjectBeingDestroyed',@(~,~)obj.unregister_element(h));

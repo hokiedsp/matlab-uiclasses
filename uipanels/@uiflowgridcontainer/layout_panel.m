@@ -68,8 +68,20 @@ try
       
       wcol = sum(Wcol(subs0(2):subs1(2)))+obj.inmargin(1)*span(2);
       hrow = sum(Hrow(subs0(1):subs1(1)))+obj.inmargin(2)*span(1);
-      wd = min(wcol,obj.elem_wlims(n,2));
-      ht = min(hrow,obj.elem_hlims(n,2));
+      
+      if obj.elem_vfixed(n) || obj.elem_hfixed(n)
+         pos = get(h(n),'Position');
+      end
+      if obj.elem_hfixed(n)
+         wd = pos(3);
+      else
+         wd = min(wcol,obj.elem_wlims(n,2));
+      end
+      if obj.elem_vfixed(n)
+         ht = pos(4);
+      else
+         ht = min(hrow,obj.elem_hlims(n,2));
+      end
       
       switch obj.elem_halign(n)
          case 1 %'left'

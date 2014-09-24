@@ -10,6 +10,8 @@ function setElement(obj,varargin)
 % WidthLimits  % width limits in pixels, each row: [min max]
 % HorizontalAlignment % 'left'|'center'|'right'|'fill'
 % VerticalAlignment   % 'bottom'|'middle'|'top'|'fill'
+% WidthFixed  % 'on'|'off'
+% HeightFixed % 'on'|'off'
 
 narginchk(4,inf);
 if ~isscalar(obj)
@@ -56,7 +58,7 @@ else
    end
 end
 
-propnames = {'location','heightlimits','widthlimits','span','horizontalalignment','verticalalignment'};
+propnames = {'location','heightlimits','widthlimits','span','horizontalalignment','verticalalignment','widthfixed','heightfixed'};
 isgridprop = true(size(pn));
 for n = 1:numel(pn)
    try
@@ -102,6 +104,10 @@ for n = 1:numel(pn)
             set_align(obj,I,pv(:,n),obj.elem_halign_opts,'elem_halign');
          case 'verticalalignment'
             set_align(obj,I,pv(:,n),obj.elem_valign_opts,'elem_valign');
+         case 'widthfixed'
+            set_fixed(obj,I,pv(:,n),'elem_hfixed');
+         case 'heightfixed'
+            set_fixed(obj,I,pv(:,n),'elem_vfixed');
       end
    else % element property
       set(h,pn(n),pv(:,n));
@@ -218,5 +224,15 @@ validateattributes(val,{'cell'},{'numel',N});
 val = cellfun(@(v)validatestring(v,opts),val,'UniformOutput',false);
 [~,val] = ismember(val,opts);
 obj.(pname)(I) = val;
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set halign
+function set_fixed(obj,I,val,pname)
+
+val = cellfun(@(v)validatestring(v,{'on','off'}),val,'UniformOutput',false);
+obj.(pname)(I) = cellfun(@(v)v(2)=='n',val);
 
 end

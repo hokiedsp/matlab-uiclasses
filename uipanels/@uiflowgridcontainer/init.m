@@ -15,6 +15,8 @@ obj.elem_subs = zeros(0,2);    % elements' placement subcripts
 obj.elem_span = zeros(0,2);    % elements' sizes in cells
 obj.elem_halign = zeros(0,1);  % elements' horizontal alignment w/in cell
 obj.elem_valign = zeros(0,1);  % elements' vertical alignment w/in cell
+obj.elem_hfixed = false(0,1);
+obj.elem_vfixed = false(0,1);
 
 obj.elem_halign_opts = {'left','center','right'}.';  % supported option strings
 obj.elem_valign_opts = {'bottom','middle','top'}.'; % supported option strings
@@ -62,10 +64,15 @@ obj.propopts.ElementsLocation = struct(...
 obj.propopts.ElementsSpan = struct(...
    'OtherTypeValidator',@(val)validateattributes(val,{'numeric'},{'nrows',numel(obj.Elements),'ncols',2,'positive'}));
 obj.propopts.ElementsHorizontalAlignment = struct(...
-   'OtherTypeValidator',@(val)validateelementsalignment(val,obj.elem_halign_opts));
+   'OtherTypeValidator',@(val)validateelementsalignment(obj,val,obj.elem_halign_opts));
 obj.propopts.ElementsVerticalAlignment = struct(...
-   'OtherTypeValidator',@(val)validateelementsalignment(val,obj.elem_valign_opts));
+   'OtherTypeValidator',@(val)validateelementsalignment(obj,val,obj.elem_valign_opts));
 obj.propopts.NumberOfElements = struct([]);
+
+obj.propopts.ElementsHeightFixed = struct(...
+   'OtherTypeValidator',@(val)validateelementsalignment(obj,val,{'on','off'}));
+obj.propopts.ElementsWidthFixed = struct(...
+   'OtherTypeValidator',@(val)validateelementsalignment(obj,val,{'on','off'}));
 
 obj.propopts.ElementsFlowing = struct(...
    'StringOptions',{{'on','off'}},...
@@ -75,11 +82,9 @@ obj.sortpropopts([],false,false,true,true);
 
 end
 
-function val = validateelementsalignment(val,opts)
+function validateelementsalignment(obj,val,opts)
 validateattributes(val,{'cell'},{'numel',numel(obj.elem_h)});
-val = cellfun(@(v)validatestring(v,opts),val,'UniformOutput',false);
-[~,val] = ismember(val,opts);
-val = val - 1;
+cellfun(@(v)validatestring(v,opts),val,'UniformOutput',false);
 end
 
 function validate_weight(val,name)

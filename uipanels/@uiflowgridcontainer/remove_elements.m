@@ -19,3 +19,5 @@ obj.elem_wlims(I,:) = [];   % elements' width limits
 obj.elem_hlims(I,:) = [];   % elements' height limits
 obj.elem_halign(I,:) = [];  % elements' horizontal alignment w/in cell
 obj.elem_valign(I,:) = [];  % elements' vertical alignment w/in cell
+obj.elem_hfixed(I,:) = [];  % elements' fixed height w/in cell
+obj.elem_vfixed(I,:) = [];  % elements' fixed width w/in cell

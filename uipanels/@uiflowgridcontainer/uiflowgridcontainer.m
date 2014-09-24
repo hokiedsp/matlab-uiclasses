@@ -95,6 +95,8 @@ classdef uiflowgridcontainer < uipanelautoresize
       ElementsSpan         % How many grid cells to occupy: each row [nrows ncols]
       ElementsHorizontalAlignment % 'left'|'center'|'right'
       ElementsVerticalAlignment   % 'bottom'|'middle'|'top'
+      ElementsHeightFixed  % 'on'|{'off'} to fix element's height (unchanged during re-layout)
+      ElementsWidthFixed   % 'on'|{'off'} to fix element's width (unchanged during re-layout)
    end
    properties (Access=protected)
       autoexpand % tf
@@ -116,6 +118,8 @@ classdef uiflowgridcontainer < uipanelautoresize
       elem_span    % elements' sizes in cells
       elem_halign  % elements' horizontal alignment w/in cell
       elem_valign  % elements' vertical alignment w/in cell
+      elem_hfixed    % true to fix elements
+      elem_vfixed    % true to fix elements
 
       elem_halign_opts  % option strings
       elem_valign_opts  % option strings
@@ -418,7 +422,10 @@ classdef uiflowgridcontainer < uipanelautoresize
          if isempty(obj.elem_h) && ~isempty(val)
             error('ElementsHorizontalAlignment can only be set if grid elements are set.');
          else
-            obj.elem_halign = obj.validateproperty('ElementsHorizontalAlignment',val);
+            obj.validateproperty('ElementsHorizontalAlignment',val);
+            val = cellfun(@(v)validatestring(v,obj.elem_halign_opts),val,'UniformOutput',false);
+            [~,obj.elem_halign] = ismember(val,obj.elem_halign_opts);
+            
             obj.layout_panel()
          end
       end
@@ -435,7 +442,9 @@ classdef uiflowgridcontainer < uipanelautoresize
          if isempty(obj.elem_h) && ~isempty(val)
             error('ElementsVerticalAlignment can only be set if grid elements are set.');
          else
-            obj.elem_valign = obj.validateproperty('ElementsVerticalAlignment',val);
+            obj.validateproperty('ElementsVerticalAlignment',val);
+            val = cellfun(@(v)validatestring(v,obj.elem_valign_opts),val,'UniformOutput',false);
+            [~,obj.elem_valign] = ismember(val,obj.elem_valign_opts);
             obj.layout_panel()
          end
       end
@@ -491,5 +500,42 @@ classdef uiflowgridcontainer < uipanelautoresize
          obj.reflow = val==1;
       end
       
+      % ElementsHeightFixed % 'left'|'center'|'right'|'fill'
+      function val = get.ElementsHeightFixed(obj)
+         if isempty(obj.elem_h)
+            val = {};
+         else
+            opts = {'off','on'};
+            val = opts(obj.elem_vfixed+1);
+         end
+      end
+      function set.ElementsHeightFixed(obj,val)
+         if isempty(obj.elem_h) && ~isempty(val)
+            error('ElementsHeightFixed can only be set if grid elements are set.');
+         else
+            obj.validateproperty('ElementsHeightFixed',val);
+            val = cellfun(@(v)validatestring(v,opts),{'off','on'},'UniformOutput',false);
+            obj.elem_vfixed(:) = cellfun(@(v)v(2)=='n',val);
+         end
+      end
+      
+      % ElementsWidthFixed   % 'bottom'|'middle'|'top'|'fill'
+      function val = get.ElementsWidthFixed(obj)
+         if isempty(obj.elem_h)
+            val = [];
+         else
+            opts = {'off','on'};
+            val = opts(obj.elem_hfixed+1);
+         end
+      end
+      function set.ElementsWidthFixed(obj,val)
+         if isempty(obj.elem_h) && ~isempty(val)
+            error('ElementsWidthFixed can only be set if grid elements are set.');
+         else
+            obj.validateproperty('ElementsWidthFixed',val);
+            val = cellfun(@(v)validatestring(v,{'off','on'}),val,'UniformOutput',false);
+            obj.elem_hfixed(:) = cellfun(@(v)v(2)=='n',val);
+         end
+      end
    end
 end
