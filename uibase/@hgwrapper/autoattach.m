@@ -60,10 +60,10 @@ end
 [sz,Iend] = hgwrapper.getdimsinput(argin);
 
 % Step 3: Check if called with 'detached' option
-if ~isempty(argin) 
+if numel(argin)>Iend
    try %#ok
-      validatestring(argin{1},{'detached'});
-      argin = [{[]} sz argin(Iend+1:end)]; % insert empty argument up front to indicate detached
+      validatestring(argin{Iend+1},{'detached'});
+      argin = [{[]} sz argin(Iend+2:end)]; % insert empty argument up front to indicate detached
       return;
    catch % continue on
    end

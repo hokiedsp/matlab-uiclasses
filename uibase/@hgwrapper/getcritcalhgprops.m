@@ -8,8 +8,8 @@ if cellprops
    pn = proppairs{1};
    pv = proppairs{2};
 else
-   pn = proppairs(Iend+1:2:end);
-   pv = proppairs(Iend+2:2:end);
+   pn = proppairs(1:2:end);
+   pv = proppairs(2:2:end);
 end
 
 % check if GraphicsHandle is specified
