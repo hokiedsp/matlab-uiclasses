@@ -10,6 +10,7 @@ obj.closevideo();
 
 if isa(filename,'VideoReader') && isscalar(filename)
    obj.vr = filename;
+   obj.autounload = false;
 else % try opening the video file
    try
       obj.vr = VideoReader(filename);
@@ -28,6 +29,10 @@ set(obj.im,'Visible','on','XData',[1 obj.vr.Width],'YData',[1 obj.vr.Height]);
 
 % set the counter
 obj.set_txloc()
+
+% make sure the current frame is within the frame range of the new file
+obj.n = min(obj.n,obj.vr.NumberOfFrames);
+obj.nbuf = [inf -inf];
 
 % update the playback range (to make sure the range is valid for the frame
 updated = isnumeric(obj.PlaybackRange);
