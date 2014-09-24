@@ -55,6 +55,9 @@ classdef uipanelex < hgenable
    
    properties (Dependent)
       AutoLayout
+   end
+   properties (Dependent,SetAccess=private)
+      DisplayArea % [width height] of the panel interior size
       Extent % tightest position rectangel encompassing all Children
    end
    properties (Access=protected)
@@ -78,7 +81,6 @@ classdef uipanelex < hgenable
       autosize(obj) % adjust base HG Position to match the content extent
    end
    methods
-      
       function obj = uipanelex(varargin)
          %UIPANELEX/UIPANELEX   Construct UIPANELEX object.
          %
@@ -160,6 +162,9 @@ classdef uipanelex < hgenable
    methods
       function val = get.Extent(obj)
          val = obj.get_contentextent();
+      end
+      function val = get.DisplayArea(obj) % [width height] of the panel interior size
+         val = obj.get_displayarea(obj.hgbase);
       end
       
       %AutoLayout       - [{'on'}|'off'] to re-layout panel automatically

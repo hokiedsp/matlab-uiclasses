@@ -12,6 +12,7 @@ obj.init@hgenable();
 obj.propopts.AutoLayout = struct(...
    'StringOptions',{{'off','on'}},...
    'Default','off');
+obj.propopts.DisplayArea = struct([]);
 obj.propopts.Extent = struct([]); % read-only
 obj.sortpropopts([],false,false,true,true);
 

@@ -7,10 +7,10 @@ function sz = get_displayarea(h)
 u = get(h,'Units');
 set(h,'Units','pixel');
 sz = get(h,'Position');
-set(h,'Units','pixel',u);
+set(h,'Units',u);
 sz([1 2]) = [];
 
-bmargin = get_bordermargins(h);
+bmargin = uipanelex.get_bordermargins(h);
 
 % adjust the width first
 sz(1) = sz(1) - sum(bmargin([1 2]));
