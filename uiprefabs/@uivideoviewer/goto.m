@@ -1,4 +1,7 @@
 function goto(obj,frm)
+%UIVIDEOVIEWER/GOTO   Go to a specified video frame
+%   GOTO(OBJ,FRM) sets the UIVIDEOVIEWER OBJ's CurrentFrame to FRM. If OBJ
+%   is currently playing, the playback resumes from FRM.
 
 if ischar(frm)
    if ~isrow(frm)
@@ -22,9 +25,4 @@ if ~(isnumeric(frm) && isscalar(frm) && frm==floor(frm))
    error('Invalid frame.');
 end
 
-isrunning = obj.isplaying();
-stop(obj.tmr)
 obj.setcurrentframe(frm);
-if isrunning, start(obj.tmr); end
-   
-end

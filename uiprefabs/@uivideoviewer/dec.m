@@ -1,33 +1,20 @@
 function dec(obj,dec)
+%UIVIDEOVIEWER/DEC   Decrement video frame
+%   DEC(OBJ,NDEC) updates the displayed video frame of UIVIDEOVIEWER OBJ by
+%   decremmenting OBJ.CurrentFrame by NDEC frames.
+%
+%   DEC(OBJ) increments OBJ.CurrentFrame by one frame.
 
+narginchk(1,2);
+
+if ~isscalar(obj)
+   error('OBJ must be a scalar %s object.',class(obj));
+end
 if nargin<2
    dec = 1;
-elseif ~(isnumeric(dec)&&isscalar(dec)&&~isinf(dec)&&~isnan(dec)&&inc==floor(dec))
-   error('DEC must be an integer.');
-end
-
-% video file must be open
-if isempty(obj.vr)
-   error('Video file is not open.');
-end
-
-% momentarily stop if running
-if obj.isplaying()
-   stop(obj.tmr);
+else
+   validateattributes(dec,{'numeric'},{'scalar','integer'});
 end
 
 % set frame
-try
-   obj.setcurrentframe(max(obj.n-dec,1))
-catch ME
-   % momentarily stop if running
-   if obj.isplaying()
-      start(obj.tmr);
-   end
-   ME.rethrow();
-end
-
-% momentarily stop if running
-if obj.isplaying()
-   start(obj.tmr);
-end
+obj.setcurrentframe(max(obj.n-dec,1))
