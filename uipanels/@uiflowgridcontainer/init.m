@@ -60,7 +60,7 @@ obj.propopts.ElementsHeightLimits = struct(...
 obj.propopts.ElementsWidthLimits = struct(...
    'OtherTypeValidator',@(val)validateattributes(val,{'numeric'},{'nrows',numel(obj.Elements),'ncols',2,'positive'}));
 obj.propopts.ElementsLocation = struct(...
-   'OtherTypeValidator',@(val)validateattributes(val,{'numeric'},{'nrows',numel(obj.Elements),'ncols',2,'positive'}));
+   'OtherTypeValidator',@(val)validate_elemsubs(obj,val));
 obj.propopts.ElementsSpan = struct(...
    'OtherTypeValidator',@(val)validateattributes(val,{'numeric'},{'nrows',numel(obj.Elements),'ncols',2,'positive'}));
 obj.propopts.ElementsHorizontalAlignment = struct(...
@@ -91,6 +91,20 @@ function validate_weight(val,name)
 validateattributes(val,{'numeric'},{'positive'},'set',name);
 if any(isinf(val))
    error('%s values must be finite or NaN.');
+end
+end
+
+function validate_elemsubs(obj,val)
+validateattributes(val,{'numeric'},{'ncols',2,'nrows',numel(obj.Elements),'positive','integer','positive'});
+if val(:,1)>obj.gridsize(1)
+   error('At least one row index exceeds OBJ.GridSize(1).');
+end
+if val(:,2)>obj.gridsize(2)
+   error('At least one column index exceeds OBJ.GridSize(2).');
+end
+
+if size(unique(val,'rows'),1)~=size(val,1)
+   error('Rows of OBJ.ElementsLocation must be unique.');
 end
 
 end
