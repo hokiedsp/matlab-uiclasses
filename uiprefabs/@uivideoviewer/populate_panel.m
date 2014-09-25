@@ -17,5 +17,5 @@ set(obj.hg,'Box','on','XTick',[],'YTick',[],'YDir','reverse',...
    'DrawMode','fast','Visible','on');
 
 % build UI
-obj.im = image('Parent',obj.hg,'CDataMapping','direct','XData',[],'YData',[],'CData',[]);
-obj.tx = text('Parent',obj.hg,'Units','normalized','Color','y');
+obj.im = handle(image('Parent',obj.hg,'CDataMapping','direct','XData',[],'YData',[],'CData',[]));
+obj.tx = handle(text('Parent',obj.hg,'Units','normalized','Color','y'));
