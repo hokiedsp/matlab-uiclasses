@@ -7,7 +7,16 @@ function open(obj,filename)
 
 narginchk(2,2);
 
-validateattributes(filename,{'char'},{'row'},mfilename,'FILENAME');
+if ~isscalar(obj)
+   error('OBJ must be a scalar %s object.',class(obj));
+end
+if isa(filename,'VideoReader')
+   if ~isscalar(filename)
+      error('VROBJ must be a scalar VideoReader object.');
+   end
+else
+   validateattributes(filename,{'char'},{'row'},mfilename,'FILENAME');
+end
 
 % open the video file
 obj.openvideo(filename);
