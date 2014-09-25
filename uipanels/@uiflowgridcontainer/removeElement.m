@@ -19,12 +19,12 @@ if isempty(obj.hg)
 end
 
 if isa(H,'hgwrapper')
-   H = obj.hgbase();
+   H = H.hgbase();
 elseif ~all(ishghandle(H))
    error('H must be an array of valid HG or HGWRAPPER objects.');
 end
 
-if nargout>2
+if nargin>2
    delopt = validatestring(delopt,{'delete','remove'});
 else
    delopt = 'd';
