@@ -37,7 +37,11 @@ for n = 1:numel(Hexist)
 end
 
 % add non-child H's as children of obj.hg
-set(H(~tf),'Parent',obj.GraphicsHandle);
+try
+   set(H(~tf),'Parent',obj.GraphicsHandle);
+catch
+   error('At least one element of H cannot be an immediate child of UIFLOWCONTAINER.');
+end
 
 % set properties
 if nargin>2
