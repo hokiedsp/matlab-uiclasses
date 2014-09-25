@@ -20,7 +20,7 @@ if N==0
 elseif N~=obj.gridsize(1)
    vweight = obj.vweight;
    vweight(N+1:obj.gridsize(1),1) = mean(vweight);
-   vweight(obj.gridsize(1)+1:end,1) = [];
+   vweight(obj.gridsize(1)+1:end) = [];
    obj.vweight = vweight;
 end
 N = numel(obj.hweight);
@@ -29,7 +29,7 @@ if N==0
 elseif N~=obj.gridsize(2)
    hweight = obj.hweight;
    hweight(N+1:obj.gridsize(2),1) = mean(hweight);
-   hweight(obj.gridsize(2)+1:end,1) = [];
+   hweight(obj.gridsize(2)+1:end) = [];
    obj.hweight = hweight;
 end
 
@@ -44,12 +44,12 @@ for n = 1:numel(obj.elem_h)
 end
 
 % force to re-layout the grid
-al = obj.autolayout;
-obj.autolayout = true;
-try
+% al = obj.autolayout;
+% obj.autolayout = true;
+% try
    obj.layout_panel();
-   obj.autolayout = al;
-catch ME
-   obj.autolayout = al;
-   ME.rethrow();
-end
+%    obj.autolayout = al;
+% catch ME
+%    obj.autolayout = al;
+%    ME.rethrow();
+% end
