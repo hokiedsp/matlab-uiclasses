@@ -67,7 +67,6 @@ classdef uivideoviewer < uipanelex
       VideoDuration
       VideoName
       VideoPath
-      Visible
       BitsPerPixel
       Height
       NumberOfFrames
@@ -92,6 +91,8 @@ classdef uivideoviewer < uipanelex
       CounterFontName
       CounterFontSize
       CounterFontWeight
+
+      Visible
    end
    properties (Dependent=true, SetAccess=private, GetAccess=public)
       Running % 'on'|'off'
