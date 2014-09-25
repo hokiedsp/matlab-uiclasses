@@ -8,7 +8,14 @@ function h = detach(obj)
 %
 %   See also HGWRAPPER, HGWRAPPER/HGWRAPPER, HGWRAPPER/ATTACH.
 
-if ~(any([obj.indelete]) || all(isvalid(obj)))
+% determine the object state
+try
+   indel = any([obj.indelete]);
+catch
+   indel = false; % object is already completely destroyed
+end
+
+if ~indel && ~all(isvalid(obj))
    error('OBJ array contains least one invalid HGWRAPPER object.');
 end
 
