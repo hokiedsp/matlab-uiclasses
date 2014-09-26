@@ -213,6 +213,8 @@ classdef uiflowgridcontainer < uipanelautoresize
       validategridsize(obj,val)
       
       reflow_grid(obj,new_gridsize) % reflow grid according to the new gridsize
+      
+      permute_elements(obj,h) % reorder Elements to match the order in h
    end
    
    methods % public property set/get methods
@@ -332,7 +334,8 @@ classdef uiflowgridcontainer < uipanelautoresize
             obj.validateproperty('Elements',val);
             val = handle(val);
             obj.remove_elements(setdiff(obj.elem_h,val)); % remove no longer in val
-            obj.addElement(setdiff(val,obj.elem_h)); % add not yet in obj.elem_h
+            obj.addElement(val); % add not yet in obj.elem_h
+            obj.permute_elements(val); % reorder to match VAL
          elseif ~isempty(val)
             error('Elements can only be set if there is an attached HG object.');
          end
@@ -515,7 +518,7 @@ classdef uiflowgridcontainer < uipanelautoresize
          else
             obj.validateproperty('ElementsHeightFixed',val);
             val = cellfun(@(v)validatestring(v,opts),{'off','on'},'UniformOutput',false);
-            obj.elem_vfixed(:) = cellfun(@(v)v(2)=='n',val);
+            obj.elem_vfixed(:) = cellfun(@(v)v(2)=='n',val(:));
          end
       end
       
@@ -534,7 +537,7 @@ classdef uiflowgridcontainer < uipanelautoresize
          else
             obj.validateproperty('ElementsWidthFixed',val);
             val = cellfun(@(v)validatestring(v,{'off','on'}),val,'UniformOutput',false);
-            obj.elem_hfixed(:) = cellfun(@(v)v(2)=='n',val);
+            obj.elem_hfixed(:) = cellfun(@(v)v(2)=='n',val(:));
          end
       end
    end
