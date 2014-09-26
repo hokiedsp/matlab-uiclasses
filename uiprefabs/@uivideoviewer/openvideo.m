@@ -8,6 +8,9 @@ function openvideo(obj,filename)
 % closes video if one's open
 obj.closevideo();
 
+% save the current visibility
+vis = obj.get_visible();
+
 if isa(filename,'VideoReader') && isscalar(filename)
    obj.vr = filename;
    obj.autounload = false;
@@ -21,11 +24,14 @@ else % try opening the video file
 end
 
 % set the axes
-set(obj.hg,'Visible','off','DataAspectRatio',[1 1 1],...
+set(obj.hg,'DataAspectRatio',[1 1 1],...
    'XLim',[0.5 obj.vr.Width+0.5],'YLim',[0.5 obj.vr.Height+0.5]);
 
-% set the image
-set(obj.im,'Visible','on','XData',[1 obj.vr.Width],'YData',[1 obj.vr.Height]);
+% set the image (transfers the object's Visible property)
+set(obj.im,'XData',[1 obj.vr.Width],'YData',[1 obj.vr.Height]);
+
+% set visibility
+obj.set_visible(vis(2)=='n'); % calls set_visible to set visibility of im and others
 
 % set the counter
 obj.set_txloc()
