@@ -7,6 +7,17 @@ Ivis = false(N,1);
 Ivis(I) = strcmp(get(hgw,'Visible'),'on');
 I = setdiff(1:N,I);
 Ivis(I) = strcmp(get(obj.elem_h(I),'Visible'),'on');
+
+% if hidden object is an axes and its children are visible, the axes is
+% considered visible
+for i = find(~Ivis).'
+   h = obj.elem_h(i);
+   if strcmp(h.Type,'axes')
+      hc = h.Children;
+      Ivis(i) = any(strcmp(get(hc,'Visible'),'on'));
+   end
+end
+
 if ~any(Ivis)
    Ivis = [];
    col_wlims = [];
