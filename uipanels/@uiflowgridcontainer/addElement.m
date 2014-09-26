@@ -23,6 +23,8 @@ elseif ~all(ishghandle(H))
    error('H must be an array of valid HG or HGWRAPPER objects.');
 end
 
+H = handle(H);
+
 % turn off the layout until all done
 al = obj.autolayout;
 obj.autolayout = false;
@@ -31,7 +33,7 @@ obj.autolayout = false;
 tf = arrayfun(@(c)handle(get(c,'Parent'))==obj.hg,H);
 
 % add existing children to the grid
-Hexist = setdiff(H(tf),obj.elem_h); % if already on grid, no need to add
+Hexist = setdiff(H(tf),obj.elem_h,'stable'); % if already on grid, no need to add
 for n = 1:numel(Hexist)
    obj.add_element(Hexist(n));
 end
