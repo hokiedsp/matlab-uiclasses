@@ -37,6 +37,8 @@ classdef uivideoviewer < uipanelex
 %      inactivate           - Inactivate (visually on, functionally off)
 %                             the panel content.
 %
+%      getCounterFormat     - Returns the counter text format
+%
 %   Getting and setting parameters:
 %      get              - Get value of UIVIDEOVIEWER object property.
 %      set              - Set value of UIVIDEOVIEWER object property.
@@ -149,6 +151,8 @@ classdef uivideoviewer < uipanelex
          val = obj.tmr.Running;
          tf = val(2)=='n'; % running if 'on'
       end
+
+      [fmt,type] = getCounterFormat(obj)
       
       function obj = uivideoviewer(varargin)
          %UIVIDEOVIEWER/UIVIDEOVIEWER   Construct UIVIDEOVIEWER object.
