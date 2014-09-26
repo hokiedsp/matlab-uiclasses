@@ -48,6 +48,6 @@ else
          pos(2) = 0.01;
          va = 'bottom';
    end
-   set(obj.tx,'Visible','on','Position',pos,'HorizontalAlignment',ha,...
+   set(obj.tx,'Visible',obj.Visible,'Position',pos,'HorizontalAlignment',ha,...
       'VerticalAlignment',va);
 end
